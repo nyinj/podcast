@@ -7,6 +7,13 @@
     android:padding="16dp"
     tools:context=".Login">
 
+    <ProgressBar
+        android:id="@+id/loginprogressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
     <LinearLayout
         android:id="@+id/top"
         android:layout_width="match_parent"
@@ -43,7 +50,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="271dp"
             android:layout_height="63dp"
-            android:hint="Username"
+            android:hint="Email"
             android:textColorHint="#A7A7A7"
             app:boxStrokeColor="#EAEAEE"
             app:layout_constraintEnd_toEndOf="parent"
@@ -52,7 +59,7 @@
             app:hintTextColor="@color/yellow">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/logUsername"
+                android:id="@+id/logemail"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
                 android:textColor="#5B5B5B"
@@ -62,7 +69,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/logtextPassword"
+            android:id="@+id/logPasswordLayout"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="271dp"
             android:layout_height="63dp"
