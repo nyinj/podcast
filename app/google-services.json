@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "914635840453",
+    "project_id": "podcast-app-b80b8",
+    "storage_bucket": "podcast-app-b80b8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:914635840453:android:1da711b8eb0e590a7f89ac",
+        "android_client_info": {
+          "package_name": "com.nyinj.podcastapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJqwC36dPJD07JbYfkyK9O2naBloffm2U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

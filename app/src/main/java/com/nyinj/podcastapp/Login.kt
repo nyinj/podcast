@@ -2,28 +2,25 @@ package com.nyinj.podcastapp
 
 import android.content.Intent
 import android.os.Bundle
+import android.renderscript.ScriptGroup.Binding
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.google.firebase.auth.FirebaseAuth
 
-class MainActivity : AppCompatActivity() {
 
-    private lateinit var auth: FirebaseAuth
-
+class Login : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.login)
 
+        val createacc : TextView =findViewById(R.id.createacc)
 
-        auth = FirebaseAuth.getInstance()
-
-        if (auth.currentUser == null){
-            val intent = Intent (this, Login::class.java )
+        createacc.setOnClickListener {
+            val intent = Intent(this, Register::class.java )
             startActivity(intent)
         }
-
     }
 }

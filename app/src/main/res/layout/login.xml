@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:padding="16dp"
+    tools:context=".Login">
+
+    <LinearLayout
+        android:id="@+id/top"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/podcast"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Welcome to Podcast"
+            android:textStyle="bold"
+            android:textSize="30sp"
+            android:padding="10dp"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enjoy various Bhutanese Podcasts"
+            android:textColor="@color/gray"
+            android:textSize="16sp"
+            android:layout_marginBottom="50dp"
+            />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/logtxtUsername"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="271dp"
+            android:layout_height="63dp"
+            android:hint="Username"
+            android:textColorHint="#A7A7A7"
+            app:boxStrokeColor="#EAEAEE"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:hintTextColor="@color/yellow">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/logUsername"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:textColor="#5B5B5B"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                tools:ignore="TouchTargetSizeCheck" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/logtextPassword"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="271dp"
+            android:layout_height="63dp"
+            android:hint="Password"
+            android:textColorHint="#A7A7A7"
+            app:endIconMode="password_toggle"
+            app:boxStrokeColor="#EAEAEE"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:hintTextColor="@color/yellow">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/logPassword"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:textColor="#5B5B5B"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                tools:ignore="TouchTargetSizeCheck" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            android:id="@+id/loginbtn"
+            android:layout_width="271dp"
+            android:layout_height="55dp"
+            android:text="LOGIN"
+            android:textAlignment="center"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginTop="50dp"
+            android:backgroundTint="@color/yellow"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            >
+            <TextView
+                android:id="@+id/acc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Don't have account?"
+                android:textColor="#A7A7A7"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/createacc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" Create a new account"
+                android:textColor="#3BA8BE"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+
+
+        </LinearLayout>
+
+
+
+
+
+    </LinearLayout>
+
+
+
+</RelativeLayout>
