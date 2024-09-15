@@ -48,8 +48,8 @@ class Register : AppCompatActivity() {
             val email = signemail.text.toString()
             val password = signpassword.text.toString()
 
-            progressBar.visibility=View.VISIBLE
-            signPasswordLayout.isPasswordVisibilityToggleEnabled=true
+            progressBar.visibility = View.VISIBLE
+            signPasswordLayout.isPasswordVisibilityToggleEnabled = true
 
             if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
                 if (name.isEmpty()) {
@@ -59,9 +59,8 @@ class Register : AppCompatActivity() {
                     signemail.error = "Enter your Email"
                 }
                 if (password.isEmpty()) {
-                    signPasswordLayout.isPasswordVisibilityToggleEnabled=false
+                    signPasswordLayout.isPasswordVisibilityToggleEnabled = false
                     signpassword.error = "Enter your Password"
-
                 }
                 Toast.makeText(this, "Enter valid details", Toast.LENGTH_SHORT).show()
                 progressBar.visibility = View.GONE
@@ -69,26 +68,27 @@ class Register : AppCompatActivity() {
                 progressBar.visibility = View.GONE
                 signemail.error = "Enter valid Email"
                 Toast.makeText(this, "Enter valid Email", Toast.LENGTH_SHORT).show()
-                progressBar.visibility = View.GONE
             } else if (password.length < 6) {
-                signPasswordLayout.isPasswordVisibilityToggleEnabled=false
+                signPasswordLayout.isPasswordVisibilityToggleEnabled = false
                 progressBar.visibility = View.GONE
                 signpassword.error = "Password too Short"
                 Toast.makeText(this, "Enter a longer password", Toast.LENGTH_SHORT).show()
             } else {
-
                 auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
-
                     if (it.isSuccessful) {
+                        // User successfully registered
                         val databaseRef = database.reference.child("users").child(auth.currentUser!!.uid)
                         val users = Users(name, email, auth.currentUser!!.uid)
 
-                        databaseRef.setValue(users).addOnCompleteListener {
-                            if (it.isSuccessful) {
+                        databaseRef.setValue(users).addOnCompleteListener { dbTask ->
+                            if (dbTask.isSuccessful) {
+                                // Explicitly sign out user before navigating to Login
+                                auth.signOut() // Ensure user is signed out
                                 val intent = Intent(this, Login::class.java)
                                 startActivity(intent)
+                                finish() // Finish the Register activity
                             } else {
-                                Toast.makeText(this, "Database Error: ${it.exception?.message}", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this, "Database Error: ${dbTask.exception?.message}", Toast.LENGTH_SHORT).show()
                                 progressBar.visibility = View.GONE
                             }
                         }
@@ -99,6 +99,7 @@ class Register : AppCompatActivity() {
                 }
             }
         }
+
     }
 }
 
