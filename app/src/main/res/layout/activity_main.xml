@@ -1,21 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:orientation="vertical"
+    tools:context=".MainActivity"
+    android:padding="0dp">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/title_bar"
+        android:paddingTop="30dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Welcome to my App"
-        android:textSize="32sp"
+        android:text="Title"
+        android:textSize="24sp"
         android:textStyle="bold"
+        android:gravity="center"
+        android:background="@color/yellow"
+        android:textColor="@color/white"/>
+
+
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        app:tabIndicatorFullWidth="true"
+        app:tabMode="fixed"
+        app:tabIndicatorGravity="stretch"
+        app:tabIndicatorAnimationMode="elastic"
+        app:tabSelectedTextColor="@color/white"
+        app:tabIndicatorColor="@null"
+        app:tabIndicator="@drawable/tab_indicator"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewpager2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/tab_layout"
+        app:layout_constraintHorizontal_bias="0.5"
+        />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>
