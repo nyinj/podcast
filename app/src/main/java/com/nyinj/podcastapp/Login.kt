@@ -28,6 +28,12 @@ class Login : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
 
+        if (auth.currentUser != null) {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
         val logemail: EditText = findViewById(R.id.logemail)
         val logpassword: EditText = findViewById(R.id.logPassword)
         val loginbtn: Button = findViewById(R.id.loginbtn)
@@ -78,7 +84,8 @@ class Login : AppCompatActivity() {
             auth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
                 progressBar.visibility = View.GONE
                 if (it.isSuccessful) {
-                    val intent = Intent(this, MainActivity::class.java)
+                    val intent = Intent(this, MainActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK}
                     startActivity(intent)
                     finish()
                 } else {
