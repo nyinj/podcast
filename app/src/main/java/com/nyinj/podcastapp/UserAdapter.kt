@@ -26,10 +26,12 @@ class UserAdapter(
         val user = users[position]
         holder.nameTextView.text = user.name
         holder.descriptionTextView.text = user.description
+        holder.followButton.text = if (user.isFollowed) "Unfollow" else "Follow"
         holder.followButton.setOnClickListener {
             onFollowClick(user)
         }
     }
+
 
     override fun getItemCount() = users.size
 }

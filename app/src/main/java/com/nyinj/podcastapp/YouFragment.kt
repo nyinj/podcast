@@ -41,9 +41,13 @@ class YouFragment : Fragment() {
             showSettingsMenu()
         }
 
-        // Reference to the TextView where the username will be displayed
+        // Reference to the TextViews where the username and description will be displayed
         val usernameTextView = view.findViewById<TextView>(R.id.username)
         val descriptionTextView = view.findViewById<TextView>(R.id.description)
+
+        // Reference to the TextViews where the followers and following counts will be displayed
+        val followersTextView = view.findViewById<TextView>(R.id.followers_count)
+        val followingTextView = view.findViewById<TextView>(R.id.following_count)
 
         // Get the current user ID
         val userId = auth.currentUser?.uid
@@ -51,7 +55,7 @@ class YouFragment : Fragment() {
             // Reference to the user's data in the Realtime Database
             databaseRef = database.reference.child("users").child(userId)
 
-            // Fetch the username from the Realtime Database
+            // Fetch the user data from the Realtime Database
             databaseRef.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     // Get the user data as a Users object
@@ -60,6 +64,12 @@ class YouFragment : Fragment() {
                         usernameTextView.text = user.name
                         descriptionTextView.text = user.description
 
+                        // Fetch and display followers and following counts
+                        val followersCount = snapshot.child("followersCount").getValue(Int::class.java) ?: 0
+                        val followingCount = snapshot.child("followingCount").getValue(Int::class.java) ?: 0
+
+                        followersTextView.text = "$followersCount"
+                        followingTextView.text = "$followingCount"
                     } else {
                         usernameTextView.text = "Unknown User"
                     }
@@ -99,6 +109,7 @@ class YouFragment : Fragment() {
         navigateToLoginScreen()
         Toast.makeText(requireContext(), "Logged out", Toast.LENGTH_SHORT).show()
     }
+
     private fun navigateToEditProfile() {
         val intent = Intent(requireContext(), EditProfileActivity::class.java)
         startActivity(intent)
