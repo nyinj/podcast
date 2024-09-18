@@ -5,6 +5,16 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <TextView
+        android:id="@+id/empty_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No more users to show"
+        android:gravity="center"
+        android:textSize="18sp"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"

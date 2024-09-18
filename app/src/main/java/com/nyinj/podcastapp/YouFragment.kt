@@ -5,6 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
@@ -36,40 +38,43 @@ class YouFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Set up the settings button click listener
-        view.findViewById<ImageView>(R.id.settings_btn).setOnClickListener {
-            showSettingsMenu()
+        val progressBar = view.findViewById<ProgressBar>(R.id.profile_progress_bar)
+        val profileContent = view.findViewById<LinearLayout>(R.id.profile_content)
+        val settingsButton = view.findViewById<ImageView>(R.id.settings_btn)
+
+        // Hide profile content initially, show progress bar
+        profileContent.visibility = View.GONE
+        progressBar.visibility = View.VISIBLE
+
+        settingsButton.setOnClickListener {
+            showSettingsMenu()  // Ensure this function gets called
         }
 
-        // Reference to the TextViews where the username and description will be displayed
         val usernameTextView = view.findViewById<TextView>(R.id.username)
         val descriptionTextView = view.findViewById<TextView>(R.id.description)
-
-        // Reference to the TextViews where the followers and following counts will be displayed
         val followersTextView = view.findViewById<TextView>(R.id.followers_count)
         val followingTextView = view.findViewById<TextView>(R.id.following_count)
 
-        // Get the current user ID
         val userId = auth.currentUser?.uid
         if (userId != null) {
-            // Reference to the user's data in the Realtime Database
             databaseRef = database.reference.child("users").child(userId)
 
-            // Fetch the user data from the Realtime Database
             databaseRef.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    // Get the user data as a Users object
                     val user = snapshot.getValue(Users::class.java)
                     if (user != null) {
                         usernameTextView.text = user.name
                         descriptionTextView.text = user.description
 
-                        // Fetch and display followers and following counts
                         val followersCount = snapshot.child("followersCount").getValue(Int::class.java) ?: 0
                         val followingCount = snapshot.child("followingCount").getValue(Int::class.java) ?: 0
 
                         followersTextView.text = "$followersCount"
                         followingTextView.text = "$followingCount"
+
+                        // Hide progress bar, show profile content once data is loaded
+                        progressBar.visibility = View.GONE
+                        profileContent.visibility = View.VISIBLE
                     } else {
                         usernameTextView.text = "Unknown User"
                     }
@@ -78,10 +83,16 @@ class YouFragment : Fragment() {
                 override fun onCancelled(error: DatabaseError) {
                     // Handle potential errors
                     Toast.makeText(requireContext(), "Error loading user data", Toast.LENGTH_SHORT).show()
+
+                    // Hide progress bar if there is an error, but still show content
+                    progressBar.visibility = View.GONE
+                    profileContent.visibility = View.VISIBLE
                 }
             })
         } else {
             usernameTextView.text = "Not logged in"
+            progressBar.visibility = View.GONE
+            profileContent.visibility = View.VISIBLE
         }
     }
 
