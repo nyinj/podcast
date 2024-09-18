@@ -15,6 +15,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ServerValue
 import com.google.firebase.database.ValueEventListener
 
 class BrowseFragment : Fragment() {
@@ -51,10 +52,7 @@ class BrowseFragment : Fragment() {
     }
 
     private fun fetchUsers() {
-        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
-        if (currentUserId == null) {
-            return
-        }
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
         // Get reference to the current user's "following" list
         val followingRef = database.reference.child("users").child(currentUserId).child("following")
@@ -66,23 +64,20 @@ class BrowseFragment : Fragment() {
             override fun onDataChange(followingSnapshot: DataSnapshot) {
                 val followingSet = mutableSetOf<String>()
                 for (followedUser in followingSnapshot.children) {
-                    followedUser.key?.let {
-                        followingSet.add(it)  // Add the followed user's ID to the set
-                    }
+                    followedUser.key?.let { followingSet.add(it) }
                 }
 
-                // Now fetch all users and filter out the followed users
-                usersRef.addValueEventListener(object : ValueEventListener {
+                usersRef.addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         users.clear()
                         for (userSnapshot in snapshot.children) {
                             val user = userSnapshot.getValue(Users::class.java)
                             if (user != null && user.uid != currentUserId && !followingSet.contains(user.uid)) {
-                                // Only add users who are not followed and are not the current user
+                                // Add users that are not followed
                                 users.add(user)
                             }
                         }
-                        userAdapter.notifyDataSetChanged()
+                        userAdapter.notifyDataSetChanged() // Update RecyclerView with filtered users
                     }
 
                     override fun onCancelled(error: DatabaseError) {
@@ -113,8 +108,9 @@ class BrowseFragment : Fragment() {
                     followedUserRef.child("followers").child(currentUserId).removeValue()
 
                     // Decrease follower and following counts
-                    userRef.child("followingCount").setValue(user.followingCount - 1)
-                    followedUserRef.child("followersCount").setValue(user.followersCount - 1)
+                    userRef.child("followingCount").setValue(ServerValue.increment(-1))
+                    followedUserRef.child("followersCount").setValue(ServerValue.increment(-1))
+
                     user.isFollowed = false
                     Toast.makeText(context, "Unfollowed ${user.name}", Toast.LENGTH_SHORT).show()
                 } else {
@@ -123,13 +119,14 @@ class BrowseFragment : Fragment() {
                     followedUserRef.child("followers").child(currentUserId).setValue(true)
 
                     // Increase follower and following counts
-                    userRef.child("followingCount").setValue(user.followingCount + 1)
-                    followedUserRef.child("followersCount").setValue(user.followersCount + 1)
+                    userRef.child("followingCount").setValue(ServerValue.increment(1))
+                    followedUserRef.child("followersCount").setValue(ServerValue.increment(1))
+
                     user.isFollowed = true
                     Toast.makeText(context, "Followed ${user.name}", Toast.LENGTH_SHORT).show()
 
-                    // Remove the followed user from the list in BrowseFragment
-                    users.remove(user) // This removes the followed user from the list
+                    // Remove the followed user from the browse list
+                    users.remove(user)
                 }
 
                 userAdapter.notifyDataSetChanged() // Update the list to reflect changes
