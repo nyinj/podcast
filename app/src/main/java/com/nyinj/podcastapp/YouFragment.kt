@@ -35,6 +35,7 @@ class YouFragment : Fragment() {
     private lateinit var userRecyclerView: RecyclerView
     private lateinit var podcastAdapter: PodcastAdapter
     private val userPodcastList = mutableListOf<Podcast>()
+    private var userPodcastCount = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,15 +71,21 @@ class YouFragment : Fragment() {
         userPodcastsRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 userPodcastList.clear() // Clear old data
+                userPodcastCount = 0 // Reset count for this fetch
                 for (podcastSnapshot in snapshot.children) {
                     val podcast = podcastSnapshot.getValue(Podcast::class.java)
                     Log.d("YouFragment", "Podcast: $podcast")
                     if (podcast != null && podcast.uploaderId == currentUserId) {
                         userPodcastList.add(podcast)
+                        userPodcastCount++ // Increment count for each podcast
                     }
                 }
                 Log.d("YouFragment", "User Podcasts: $userPodcastList")
                 podcastAdapter.notifyDataSetChanged() // Update RecyclerView
+
+                // Update the podcast count TextView
+                val podcastCountTextView = view?.findViewById<TextView>(R.id.podcast_count)
+                podcastCountTextView?.text = userPodcastCount.toString()
             }
 
             override fun onCancelled(error: DatabaseError) {
