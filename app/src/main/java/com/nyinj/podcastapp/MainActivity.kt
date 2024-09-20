@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
 
         tabLayout.addTab(tabLayout.newTab().setText("Home"))
         tabLayout.addTab(tabLayout.newTab().setText("Browse"))
+        tabLayout.addTab(tabLayout.newTab().setText("Explore"))
         tabLayout.addTab(tabLayout.newTab().setText("Library"))
         tabLayout.addTab(tabLayout.newTab().setText("You"))
 

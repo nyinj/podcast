@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,6 +24,7 @@ class BrowseFragment : Fragment() {
     private lateinit var database: FirebaseDatabase
     private lateinit var recyclerView: RecyclerView
     private lateinit var userAdapter: UserAdapter
+    private lateinit var progressBar: ProgressBar
     private val users = mutableListOf<Users>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,17 +49,16 @@ class BrowseFragment : Fragment() {
             followUser(user)
         }
         recyclerView.adapter = userAdapter
+        progressBar = view.findViewById(R.id.progress_bar)
 
         fetchUsers()
     }
 
     private fun fetchUsers() {
+        progressBar.visibility = View.VISIBLE // Show ProgressBar
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
-        // Get reference to the current user's "following" list
         val followingRef = database.reference.child("users").child(currentUserId).child("following")
-
-        // Get all users from the "users" node
         val usersRef = database.reference.child("users")
 
         followingRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -73,24 +74,28 @@ class BrowseFragment : Fragment() {
                         for (userSnapshot in snapshot.children) {
                             val user = userSnapshot.getValue(Users::class.java)
                             if (user != null && user.uid != currentUserId && !followingSet.contains(user.uid)) {
-                                // Add users that are not followed
                                 users.add(user)
                             }
                         }
-                        userAdapter.notifyDataSetChanged() // Update RecyclerView with filtered users
+                        userAdapter.notifyDataSetChanged()
+                        progressBar.visibility = View.GONE // Hide ProgressBar
+                        recyclerView.visibility = View.VISIBLE // Show RecyclerView
                     }
 
                     override fun onCancelled(error: DatabaseError) {
+                        progressBar.visibility = View.GONE // Hide ProgressBar on error
                         Toast.makeText(context, "Error fetching users: ${error.message}", Toast.LENGTH_SHORT).show()
                     }
                 })
             }
 
             override fun onCancelled(error: DatabaseError) {
+                progressBar.visibility = View.GONE // Hide ProgressBar on error
                 Toast.makeText(context, "Error fetching followed users: ${error.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
+
 
 
     private fun followUser(user: Users) {

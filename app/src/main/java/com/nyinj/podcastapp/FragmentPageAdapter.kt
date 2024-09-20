@@ -11,15 +11,16 @@ class FragmentPageAdapter(
 ): FragmentStateAdapter(fragmentManager, lifecycle) {
 
     override fun getItemCount(): Int {
-        return 4
+        return 5
     }
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
             0 -> HomeFragment()
             1 -> BrowseFragment()
-            2 -> LibraryFragment()
-            3 -> YouFragment()
+            2 -> ExploreFragment()
+            3 -> LibraryFragment()
+            4 -> YouFragment()
             else -> throw IllegalArgumentException("Invalid position $position") //safety check
         }
     }
