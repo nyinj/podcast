@@ -1,8 +1,7 @@
-package com.nyinj.podcastapp
+package com.nyinj.podcastapp.Activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
@@ -12,10 +11,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
+import com.nyinj.podcastapp.R
 
 class Login : AppCompatActivity() {
     private val emailPattern = Regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}\$")

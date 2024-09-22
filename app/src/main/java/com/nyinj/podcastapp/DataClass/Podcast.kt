@@ -1,3 +1,5 @@
+package com.nyinj.podcastapp.DataClass
+
 data class Podcast(
     val title: String = "",
     val description: String = "",

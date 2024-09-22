@@ -1,9 +1,7 @@
-package com.nyinj.podcastapp
+package com.nyinj.podcastapp.Fragments
 
-import UserAdapter
-import Users
+import com.nyinj.podcastapp.Adapters.UserAdapter
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -18,8 +16,10 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ServerValue
 import com.google.firebase.database.ValueEventListener
+import com.nyinj.podcastapp.DataClass.Users
+import com.nyinj.podcastapp.R
 
-class BrowseFragment : Fragment() {
+class ExploreFragment : Fragment() {
 
     private lateinit var database: FirebaseDatabase
     private lateinit var recyclerView: RecyclerView
@@ -36,7 +36,7 @@ class BrowseFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_browse, container, false)
+        return inflater.inflate(R.layout.fragment_explore, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

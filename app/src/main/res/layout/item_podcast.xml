@@ -1,31 +1,58 @@
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_centerVertical="true">
 
-    <TextView
-        android:id="@+id/podcast_title"
+    <LinearLayout
+        android:id="@+id/title_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:textStyle="bold"/>
+        android:orientation="vertical"
+        android:paddingLeft="20dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp">
+        <TextView
+            android:id="@+id/podcast_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="title"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/podcastDescription"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="14sp"/>
+        <TextView
+            android:id="@+id/podcastDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="description"
+            android:textSize="15sp"
+            android:layout_alignBottom="@+id/podcast_title"/>
+
+
+    </LinearLayout>
+
+
 
     <ImageButton
         android:id="@+id/play_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerInParent="true"
         android:src="@drawable/ic_play"
         android:contentDescription="Play"
-        android:background="?attr/selectableItemBackground"
-        android:padding="8dp"/>
+        android:paddingRight="16dp"
+        android:background="?attr/selectableItemBackground"/>
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/title_description"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/divider" />
 
 
 
-</LinearLayout>
+</RelativeLayout>

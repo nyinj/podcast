@@ -1,15 +1,14 @@
-package com.nyinj.podcastapp
+package com.nyinj.podcastapp.Activities
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.viewpager2.widget.ViewPager2
-import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.tabs.TabLayout
 import com.google.firebase.auth.FirebaseAuth
+import com.nyinj.podcastapp.Adapters.FragmentPageAdapter
+import com.nyinj.podcastapp.R
 
 class MainActivity : AppCompatActivity() {
 

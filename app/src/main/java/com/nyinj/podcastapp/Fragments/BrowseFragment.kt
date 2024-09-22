@@ -1,7 +1,8 @@
-package com.nyinj.podcastapp
+package com.nyinj.podcastapp.Fragments
 
-import Podcast
-import PodcastAdapter
+import com.nyinj.podcastapp.DataClass.Podcast
+import com.nyinj.podcastapp.Adapters.PodcastAdapter
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,8 +17,10 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.nyinj.podcastapp.Activities.PodcastPlayerActivity
+import com.nyinj.podcastapp.R
 
-class ExploreFragment : Fragment() {
+class BrowseFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var podcastAdapter: PodcastAdapter
@@ -29,7 +32,7 @@ class ExploreFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_explore, container, false)
+        val view = inflater.inflate(R.layout.fragment_browse, container, false)
 
         database = FirebaseDatabase.getInstance()  // Add this line to initialize Firebase Database
 
@@ -40,7 +43,17 @@ class ExploreFragment : Fragment() {
         // Set up RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         podcastList = mutableListOf()
-        podcastAdapter = PodcastAdapter(podcastList)
+        // Initialize adapter and handle play button click
+        podcastAdapter = PodcastAdapter(podcastList) { podcast ->
+            // Handle play button click here
+            val intent = Intent(requireContext(), PodcastPlayerActivity::class.java).apply {
+                putExtra("AUDIO_URL", podcast.audioUrl)
+                putExtra("PODCAST_TITLE", podcast.title)
+                // Pass more data if needed
+            }
+            startActivity(intent)
+        }
+
         recyclerView.adapter = podcastAdapter
 
         // Fetch podcasts and show progress bar while loading

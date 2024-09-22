@@ -1,8 +1,7 @@
-package com.nyinj.podcastapp
+package com.nyinj.podcastapp.Fragments
 
-import Podcast
-import PodcastAdapter
-import Users
+import com.nyinj.podcastapp.DataClass.Podcast
+import com.nyinj.podcastapp.Adapters.PodcastAdapter
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -17,13 +16,17 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
+import com.nyinj.podcastapp.Activities.EditProfileActivity
+import com.nyinj.podcastapp.Activities.Login
+import com.nyinj.podcastapp.Activities.PodcastPlayerActivity
+import com.nyinj.podcastapp.DataClass.Users
+import com.nyinj.podcastapp.R
 
 class YouFragment : Fragment() {
 
@@ -55,7 +58,18 @@ class YouFragment : Fragment() {
         // Set up RecyclerView
         userRecyclerView = view.findViewById(R.id.userRecyclerView)
         userRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        podcastAdapter = PodcastAdapter(userPodcastList)
+
+        // Initialize adapter with play button click handler
+        podcastAdapter = PodcastAdapter(userPodcastList) { podcast ->
+            // Handle play button click here
+            val intent = Intent(requireContext(), PodcastPlayerActivity::class.java).apply {
+                putExtra("AUDIO_URL", podcast.audioUrl)
+                putExtra("PODCAST_TITLE", podcast.title)
+                // Pass other data if needed
+            }
+            startActivity(intent)
+        }
+
         userRecyclerView.adapter = podcastAdapter
 
         // Fetch data from Firebase for current user
@@ -74,7 +88,7 @@ class YouFragment : Fragment() {
                 userPodcastCount = 0 // Reset count for this fetch
                 for (podcastSnapshot in snapshot.children) {
                     val podcast = podcastSnapshot.getValue(Podcast::class.java)
-                    Log.d("YouFragment", "Podcast: $podcast")
+                    Log.d("YouFragment", "com.nyinj.podcastapp.DataClass.Podcast: $podcast")
                     if (podcast != null && podcast.uploaderId == currentUserId) {
                         userPodcastList.add(podcast)
                         userPodcastCount++ // Increment count for each podcast
@@ -195,7 +209,7 @@ class YouFragment : Fragment() {
         val descriptionInput = dialogView.findViewById<EditText>(R.id.podcastDescription)
 
         val dialog = android.app.AlertDialog.Builder(requireContext())
-            .setTitle("Podcast Details")
+            .setTitle("com.nyinj.podcastapp.DataClass.Podcast Details")
             .setView(dialogView)
             .setPositiveButton("Upload") { _, _ ->
                 val podcastTitle = titleInput.text.toString()
@@ -241,7 +255,7 @@ class YouFragment : Fragment() {
         )
         podcastRef.setValue(podcast).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                Toast.makeText(requireContext(), "Podcast uploaded successfully!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "com.nyinj.podcastapp.DataClass.Podcast uploaded successfully!", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(requireContext(), "Failed to upload podcast metadata.", Toast.LENGTH_SHORT).show()
             }

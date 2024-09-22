@@ -1,4 +1,4 @@
-package com.nyinj.podcastapp
+package com.nyinj.podcastapp.Activities
 
 import android.os.Bundle
 import android.widget.Button
@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.nyinj.podcastapp.R
 
 class EditProfileActivity : AppCompatActivity() {
 
