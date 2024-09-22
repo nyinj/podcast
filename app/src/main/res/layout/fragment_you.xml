@@ -174,12 +174,15 @@
         android:text="+ Upload Podcast"
         android:textAlignment="center"
         android:layout_gravity="center"
+        android:backgroundTint="@color/yellow"
         android:layout_marginTop="20dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/userRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical" />
+        android:scrollbars="vertical"
+
+        />
 
 </LinearLayout>
