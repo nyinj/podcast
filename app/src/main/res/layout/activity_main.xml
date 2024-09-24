@@ -32,7 +32,7 @@
         app:tabIndicatorGravity="stretch"
         app:tabIndicatorAnimationMode="elastic"
         app:tabSelectedTextColor="@color/white"
-        app:tabIndicatorColor="@null"
+        app:tabIndicatorColor="@color/white"
         app:tabIndicator="@drawable/tab_indicator"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

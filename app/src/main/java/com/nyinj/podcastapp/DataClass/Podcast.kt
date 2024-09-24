@@ -1,6 +1,7 @@
 package com.nyinj.podcastapp.DataClass
 
 data class Podcast(
+    val id: String ="",
     val title: String = "",
     val description: String = "",
     val audioUrl: String = "",
