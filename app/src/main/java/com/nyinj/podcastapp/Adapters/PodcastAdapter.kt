@@ -11,13 +11,13 @@ import com.nyinj.podcastapp.R
 
 class PodcastAdapter(
     private val podcasts: List<Podcast>,
-    private val onPlayButtonClick: (Podcast) -> Unit // Callback for handling play button click
+    private val onPlayButtonClick: (Podcast) -> Unit, // Callback for play button
 ) : RecyclerView.Adapter<PodcastAdapter.PodcastViewHolder>() {
 
     class PodcastViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val title: TextView = itemView.findViewById(R.id.podcast_title)
         val description: TextView = itemView.findViewById(R.id.podcastDescription)
-        val playButton: ImageButton = itemView.findViewById(R.id.play_button) // Play button reference
+        val playButton: ImageButton = itemView.findViewById(R.id.play_button)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PodcastViewHolder {

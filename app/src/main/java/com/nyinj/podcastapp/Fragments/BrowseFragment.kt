@@ -34,25 +34,28 @@ class BrowseFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_browse, container, false)
 
-        database = FirebaseDatabase.getInstance()  // Add this line to initialize Firebase Database
+        database = FirebaseDatabase.getInstance()
 
         // Initialize views
         recyclerView = view.findViewById(R.id.exploreRecyclerView)
-        progressBar = view.findViewById(R.id.explore_progress_bar)  // Find the ProgressBar
+        progressBar = view.findViewById(R.id.explore_progress_bar)
 
         // Set up RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         podcastList = mutableListOf()
-        // Initialize adapter and handle play button click
-        podcastAdapter = PodcastAdapter(podcastList) { podcast ->
-            // Handle play button click here
-            val intent = Intent(requireContext(), PodcastPlayerActivity::class.java).apply {
-                putExtra("AUDIO_URL", podcast.audioUrl)
-                putExtra("PODCAST_TITLE", podcast.title)
-                // Pass more data if needed
+
+        // Initialize adapter and handle play and favorite button clicks
+        podcastAdapter = PodcastAdapter(
+            podcastList,
+            onPlayButtonClick = { podcast ->
+                // Handle play button click
+                val intent = Intent(requireContext(), PodcastPlayerActivity::class.java).apply {
+                    putExtra("AUDIO_URL", podcast.audioUrl)
+                    putExtra("PODCAST_TITLE", podcast.title)
+                }
+                startActivity(intent)
             }
-            startActivity(intent)
-        }
+        )
 
         recyclerView.adapter = podcastAdapter
 
@@ -62,37 +65,41 @@ class BrowseFragment : Fragment() {
         return view
     }
 
-    private fun fetchPodcasts() {
-        // Show the progress bar before loading
+    private var lastFetchedKey: String? = null // Track the last fetched key
+
+    private fun fetchPodcasts(limit: Int = 20) {
         progressBar.visibility = View.VISIBLE
         recyclerView.visibility = View.GONE
 
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
-        val podcastRef = database.getReference("podcasts")
+        val podcastRef = database.getReference("podcasts").limitToFirst(limit)
+
+        if (lastFetchedKey != null) {
+            podcastRef.startAt(lastFetchedKey)
+        }
 
         podcastRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                podcastList.clear()  // Clear the list before adding new data
+                podcastList.clear()
 
                 for (data in snapshot.children) {
                     val podcast = data.getValue(Podcast::class.java)
                     if (podcast != null && podcast.uploaderId != currentUserId) {
                         podcastList.add(podcast)
+                        lastFetchedKey = data.key // Update the last fetched key
                     }
                 }
                 podcastAdapter.notifyDataSetChanged()
-
-                // Hide the progress bar and show the RecyclerView when data is loaded
                 progressBar.visibility = View.GONE
                 recyclerView.visibility = View.VISIBLE
             }
 
             override fun onCancelled(error: DatabaseError) {
-                // Hide the progress bar and show a failure message
                 progressBar.visibility = View.GONE
                 recyclerView.visibility = View.VISIBLE
                 Toast.makeText(requireContext(), "Failed to load podcasts", Toast.LENGTH_SHORT).show()
             }
         })
     }
+
 }

@@ -7,8 +7,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.nyinj.podcastapp.Fragments.BrowseFragment
 import com.nyinj.podcastapp.Fragments.ExploreFragment
 import com.nyinj.podcastapp.Fragments.YouFragment
-import com.nyinj.podcastapp.HomeFragment
-import com.nyinj.podcastapp.LibraryFragment
+import com.nyinj.podcastapp.Fragments.HomeFragment
 
 class FragmentPageAdapter(
     fragmentManager: FragmentManager,
@@ -16,7 +15,7 @@ class FragmentPageAdapter(
 ): FragmentStateAdapter(fragmentManager, lifecycle) {
 
     override fun getItemCount(): Int {
-        return 5
+        return 4
     }
 
     override fun createFragment(position: Int): Fragment {
@@ -24,8 +23,7 @@ class FragmentPageAdapter(
             0 -> HomeFragment()
             1 -> ExploreFragment()
             2 -> BrowseFragment()
-            3 -> LibraryFragment()
-            4 -> YouFragment()
+            3 -> YouFragment()
             else -> throw IllegalArgumentException("Invalid position $position") //safety check
         }
     }

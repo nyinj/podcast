@@ -7,5 +7,6 @@ data class Users(
     val description: String = "",
     var isFollowed: Boolean = false,
     var followersCount: Int = 0,
-    var followingCount: Int = 0
+    var followingCount: Int = 0,
+    val favorites: MutableList<String> = mutableListOf()
 )

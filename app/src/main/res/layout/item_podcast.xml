@@ -40,22 +40,12 @@
         >
 
         <ImageButton
-            android:id="@+id/favoriteButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/favourite"
-            android:layout_centerInParent="true"
-            android:contentDescription="@string/favorite_button" />
-
-
-        <ImageButton
             android:id="@+id/play_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_play"
             android:contentDescription="Play"
             android:layout_centerInParent="true"
-            android:layout_toRightOf="@+id/favoriteButton"
             android:paddingRight="16dp"
             android:background="?attr/selectableItemBackground"/>
 

@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager2: ViewPager2
     private lateinit var adapter: FragmentPageAdapter
-    private val tabTitles = arrayOf("Home", "Explore", "Browse", "Library", "You")
+    private val tabTitles = arrayOf("Home", "Explore", "Browse", "You")
     private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,7 +33,6 @@ class MainActivity : AppCompatActivity() {
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_home))
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_explore))
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_browse))
-        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_library))
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_you))
 
         viewPager2.adapter=adapter
@@ -75,5 +74,9 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+    }
+
+    fun setCurrentTab(index: Int) {
+        viewPager2.currentItem = index
     }
 }
