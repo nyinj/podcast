@@ -8,9 +8,9 @@ import android.app.Service
 import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Binder
-import android.os.IBinder
 import android.os.Build
-import android.util.Log // Import logging
+import android.os.IBinder
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.nyinj.podcastapp.R
 import com.nyinj.podcastapp.Activities.MainActivity
@@ -19,7 +19,7 @@ class MediaPlayerService : Service() {
 
     private val binder = MediaPlayerBinder()
     private lateinit var mediaPlayer: MediaPlayer
-    var isPlaying = false
+    var isPlaying = true
 
     override fun onBind(intent: Intent?): IBinder {
         return binder
@@ -31,40 +31,31 @@ class MediaPlayerService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val audioUrl = intent?.getStringExtra("AUDIO_URL") ?: return START_NOT_STICKY
-        Log.d("MediaPlayerService", "Received audio URL: $audioUrl") // Log audio URL
+        Log.d("MediaPlayerService", "Received audio URL: $audioUrl")
 
-        // Release any existing MediaPlayer instance to avoid issues
         if (this::mediaPlayer.isInitialized) {
-            Log.d("MediaPlayerService", "Releasing existing MediaPlayer")
             mediaPlayer.release()
         }
 
         try {
             mediaPlayer = MediaPlayer().apply {
                 setDataSource(audioUrl)
-                Log.d("MediaPlayerService", "Setting data source to MediaPlayer")
                 prepareAsync()
-                Log.d("MediaPlayerService", "Preparing MediaPlayer asynchronously")
-
                 setOnPreparedListener {
-                    Log.d("MediaPlayerService", "MediaPlayer is prepared, starting playback")
                     start()
-                    this@MediaPlayerService.isPlaying = true // Corrected the reference to isPlaying
+                    this@MediaPlayerService.isPlaying = true
                     startForegroundService()
                 }
-
                 setOnCompletionListener {
-                    Log.d("MediaPlayerService", "Playback completed")
                     stopForeground(true)
                     stopSelf()
-                    this@MediaPlayerService.isPlaying = false // Ensure isPlaying is false when finished
+                    this@MediaPlayerService.isPlaying = false
                 }
-
                 setOnErrorListener { _, what, extra ->
-                    Log.e("MediaPlayerService", "Error occurred: what=$what, extra=$extra")
+                    Log.e("MediaPlayerService", "Error: what=$what, extra=$extra")
                     stopForeground(true)
                     stopSelf()
-                    this@MediaPlayerService.isPlaying = false // Ensure isPlaying is false on error
+                    this@MediaPlayerService.isPlaying = false
                     true
                 }
             }
@@ -76,32 +67,42 @@ class MediaPlayerService : Service() {
         return START_NOT_STICKY
     }
 
-    fun skipForward() {
+    fun playPause() {
         if (this::mediaPlayer.isInitialized) {
-            mediaPlayer.let {
-                val currentPosition = it.currentPosition
-                val newPosition = currentPosition + 10000 // Skip forward by 10 seconds (10,000 ms)
-                Log.d("MediaPlayerService", "Skipping forward 10 seconds: $newPosition")
-                if (newPosition < it.duration) {
-                    it.seekTo(newPosition)
-                }
+            if (isPlaying) {
+                mediaPlayer.pause()
+            } else {
+                mediaPlayer.start()
             }
+            isPlaying = !isPlaying
         }
     }
 
+    // Method to get the current position
+    fun getCurrentPosition(): Int {
+        return mediaPlayer.currentPosition
+    }
+
+    // Method to get the duration of the media
+    fun getDuration(): Int {
+        return mediaPlayer.duration
+    }
+
+    // Method to seek to a specific position
+    fun seekTo(position: Int) {
+        mediaPlayer.seekTo(position)
+    }
+
+    // Method to skip forward 10 seconds
+    fun skipForward() {
+        val newPosition = mediaPlayer.currentPosition + 10000 // 10 seconds forward
+        mediaPlayer.seekTo(newPosition.coerceAtMost(mediaPlayer.duration))
+    }
+
+    // Method to skip backward 10 seconds
     fun skipBackward() {
-        if (this::mediaPlayer.isInitialized) {
-            mediaPlayer.let {
-                val currentPosition = it.currentPosition
-                val newPosition = currentPosition - 10000 // Skip backward by 10 seconds
-                Log.d("MediaPlayerService", "Skipping backward 10 seconds: $newPosition")
-                if (newPosition > 0) {
-                    it.seekTo(newPosition)
-                } else {
-                    it.seekTo(0)
-                }
-            }
-        }
+        val newPosition = mediaPlayer.currentPosition - 10000 // 10 seconds back
+        mediaPlayer.seekTo(newPosition.coerceAtLeast(0))
     }
 
     private fun startForegroundService() {
@@ -114,8 +115,9 @@ class MediaPlayerService : Service() {
         }
 
         val notificationIntent = Intent(this, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent,
-            PendingIntent.FLAG_IMMUTABLE)
+        val pendingIntent = PendingIntent.getActivity(
+            this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE
+        )
 
         val notification: Notification = NotificationCompat.Builder(this, "media_playback")
             .setContentTitle("Podcast is playing")
@@ -124,50 +126,12 @@ class MediaPlayerService : Service() {
             .setContentIntent(pendingIntent)
             .build()
 
-        Log.d("MediaPlayerService", "Starting foreground service with notification")
         startForeground(1, notification)
-    }
-
-    fun playPause() {
-        if (this::mediaPlayer.isInitialized) {
-            if (isPlaying) {
-                Log.d("MediaPlayerService", "Pausing playback")
-                mediaPlayer.pause()
-            } else {
-                Log.d("MediaPlayerService", "Resuming playback")
-                mediaPlayer.start()
-            }
-            isPlaying = !isPlaying
-        }
-    }
-
-    fun seekTo(position: Int) {
-        if (this::mediaPlayer.isInitialized && position >= 0 && position <= getDuration()) {
-            Log.d("MediaPlayerService", "Seeking to position: $position")
-            mediaPlayer.seekTo(position)
-        }
-    }
-
-    fun getCurrentPosition(): Int {
-        return if (this::mediaPlayer.isInitialized) {
-            mediaPlayer.currentPosition
-        } else {
-            0
-        }
-    }
-
-    fun getDuration(): Int {
-        return if (this::mediaPlayer.isInitialized) {
-            mediaPlayer.duration
-        } else {
-            0
-        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         if (this::mediaPlayer.isInitialized) {
-            Log.d("MediaPlayerService", "Releasing MediaPlayer on service destroy")
             mediaPlayer.release()
         }
     }

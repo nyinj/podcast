@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Handler
 import android.os.IBinder
+import android.util.Log
 import com.nyinj.podcastapp.R
 import com.nyinj.podcastapp.Services.MediaPlayerService
 
@@ -35,6 +36,9 @@ class PodcastPlayerActivity : AppCompatActivity() {
             mediaPlayerService = binder.getService()
             serviceBound = true
             updateSeekBar()
+
+            // Check if the audio is currently playing and update the play/pause button accordingly
+            updatePlayPauseButton()
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -47,6 +51,10 @@ class PodcastPlayerActivity : AppCompatActivity() {
         setContentView(R.layout.activity_podcast_player)
 
         val audioUrl = intent.getStringExtra("AUDIO_URL")
+
+        if (audioUrl != null) {
+            startMediaPlayerService(audioUrl)
+        }
         val serviceIntent = Intent(this, MediaPlayerService::class.java).apply {
             putExtra("AUDIO_URL", audioUrl)
         }
@@ -100,6 +108,14 @@ class PodcastPlayerActivity : AppCompatActivity() {
         }
     }
 
+    private fun startMediaPlayerService(audioUrl: String) {
+        val serviceIntent = Intent(this, MediaPlayerService::class.java).apply {
+            putExtra("AUDIO_URL", audioUrl)
+        }
+        startService(serviceIntent)
+        bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+    }
+
     private fun updateSeekBar() {
         if (serviceBound) {
             seekBar.max = mediaPlayerService.getDuration()
@@ -112,6 +128,7 @@ class PodcastPlayerActivity : AppCompatActivity() {
     }
 
     private fun updatePlayPauseButton() {
+        Log.d("PodcastPlayerActivity", "Updating play/pause button. Is playing: ${mediaPlayerService.isPlaying}")
         if (serviceBound) {
             if (mediaPlayerService.isPlaying) {
                 playpauseButton.setImageResource(R.drawable.ic_pause)
@@ -136,9 +153,6 @@ class PodcastPlayerActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (serviceBound && mediaPlayerService.isPlaying) {
-            mediaPlayerService.playPause()
-        }
         super.onBackPressed() // Closes the activity
     }
 }

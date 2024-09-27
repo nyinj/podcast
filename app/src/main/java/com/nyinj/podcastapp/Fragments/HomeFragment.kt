@@ -38,8 +38,6 @@ class HomeFragment : Fragment() {
         val cardExplore: CardView = view.findViewById(R.id.card_explore)
         val cardBrowse: CardView = view.findViewById(R.id.card_browse)
 
-        // Fetch recently played podcasts
-        fetchRecentlyPlayedPodcastsFromFirebase()
         cardExplore.setOnClickListener {
             // Navigate to Explore Users Tab
             (activity as? MainActivity)?.setCurrentTab(1) // Adjust index for Explore tab
@@ -53,38 +51,4 @@ class HomeFragment : Fragment() {
         return view
     }
 
-    private fun fetchRecentlyPlayedPodcastsFromFirebase() {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
-        val database = FirebaseDatabase.getInstance().reference
-
-        database.child("users").child(userId!!).child("recentlyPlayed").addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                recentlyPlayedPodcasts = snapshot.children.mapNotNull { it.getValue(Podcast::class.java) }
-                    .sortedByDescending { it.timestamp }
-
-                podcastAdapter = PodcastAdapter(recentlyPlayedPodcasts,
-                    { podcast ->
-                        val intent = Intent(requireContext(), PodcastPlayerActivity::class.java).apply {
-                            putExtra("AUDIO_URL", podcast.audioUrl)
-                            putExtra("PODCAST_TITLE", podcast.title)
-                        }
-                        startActivity(intent)
-                    }
-                )
-                recyclerView.adapter = podcastAdapter
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                // Handle any errors
-                Toast.makeText(requireContext(), "Error fetching data", Toast.LENGTH_SHORT).show()
-            }
-        })
-    }
-    fun saveRecentlyPlayedPodcastToFirebase(podcast: Podcast) {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
-        val database = FirebaseDatabase.getInstance().reference
-
-        // Add the podcast to the user's recently played podcasts
-        database.child("users").child(userId!!).child("recentlyPlayed").child(podcast.title).setValue(podcast)
-    }
 }

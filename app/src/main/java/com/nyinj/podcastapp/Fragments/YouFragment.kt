@@ -59,13 +59,15 @@ class YouFragment : Fragment() {
         userRecyclerView = view.findViewById(R.id.userRecyclerView)
         userRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        podcastAdapter = PodcastAdapter(userPodcastList) { podcast ->
-            val intent = Intent(requireContext(), PodcastPlayerActivity::class.java).apply {
-                putExtra("AUDIO_URL", podcast.audioUrl)
-                putExtra("PODCAST_TITLE", podcast.title)
+        podcastAdapter = PodcastAdapter(requireContext(), userPodcastList, // Pass the context to the adapter
+            { podcast ->
+                // Handle item click to play podcast in a new activity
+                val intent = Intent(requireContext(), PodcastPlayerActivity::class.java).apply {
+                    putExtra("AUDIO_URL", podcast.audioUrl) // Pass the audio URL
+                }
+                startActivity(intent) // Start the PodcastPlayerActivity
             }
-            startActivity(intent)
-        }
+        )
 
         userRecyclerView.adapter = podcastAdapter
 

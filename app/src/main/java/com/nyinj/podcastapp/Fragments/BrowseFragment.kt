@@ -45,15 +45,13 @@ class BrowseFragment : Fragment() {
         podcastList = mutableListOf()
 
         // Initialize adapter and handle play and favorite button clicks
-        podcastAdapter = PodcastAdapter(
-            podcastList,
-            onPlayButtonClick = { podcast ->
-                // Handle play button click
+        podcastAdapter = PodcastAdapter(requireContext(), podcastList, // Pass the context to the adapter
+            { podcast ->
+                // Handle item click to play podcast in a new activity
                 val intent = Intent(requireContext(), PodcastPlayerActivity::class.java).apply {
-                    putExtra("AUDIO_URL", podcast.audioUrl)
-                    putExtra("PODCAST_TITLE", podcast.title)
+                    putExtra("AUDIO_URL", podcast.audioUrl) // Pass the audio URL
                 }
-                startActivity(intent)
+                startActivity(intent) // Start the PodcastPlayerActivity
             }
         )
 
