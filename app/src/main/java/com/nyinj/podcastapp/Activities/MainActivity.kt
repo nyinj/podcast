@@ -3,8 +3,10 @@ package com.nyinj.podcastapp.Activities
 import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -30,6 +32,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("MainActivity", "onCreate called")
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
@@ -38,6 +41,7 @@ class MainActivity : AppCompatActivity() {
 
         adapter = FragmentPageAdapter(supportFragmentManager, lifecycle)
 
+        // Set icons for tabs instead of text
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_home))
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_explore))
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_browse))
@@ -45,6 +49,7 @@ class MainActivity : AppCompatActivity() {
 
         viewPager2.adapter = adapter
 
+        // Display the title of the selected tab
         findViewById<TextView>(R.id.title_bar).text = tabTitles[0]
 
         // Initialize mini player views
@@ -52,26 +57,36 @@ class MainActivity : AppCompatActivity() {
         miniPlayerTitle = findViewById(R.id.mini_player_title)
         miniPlayerPlayPauseButton = findViewById(R.id.mini_player_play_pause)
 
-        // Start playing a podcast (assume the podcast URL is passed through an Intent)
+        // Handle incoming podcast URL from intent
         val podcastUrl = intent.getStringExtra("AUDIO_URL")
+        Log.d("MainActivity", "Podcast URL: $podcastUrl")
 
         if (!podcastUrl.isNullOrEmpty()) {
             initializeMediaPlayer(podcastUrl)
+        } else {
+            Log.w("MainActivity", "Podcast URL is null or empty")
         }
 
+        // Play/Pause button logic for the mini player
         miniPlayerPlayPauseButton.setOnClickListener {
             if (::mediaPlayer.isInitialized && mediaPlayer.isPlaying) {
+                Log.d("MainActivity", "Pausing media player")
                 mediaPlayer.pause()
                 miniPlayerPlayPauseButton.setImageResource(R.drawable.ic_play)
             } else if (::mediaPlayer.isInitialized) {
+                Log.d("MainActivity", "Starting media player")
                 mediaPlayer.start()
                 miniPlayerPlayPauseButton.setImageResource(R.drawable.ic_pause)
+            } else {
+                Log.e("MainActivity", "MediaPlayer is not initialized")
             }
         }
 
+        // Handle tab changes
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 if (tab != null) {
+                    Log.d("MainActivity", "Tab selected: ${tabTitles[tab.position]}")
                     viewPager2.currentItem = tab.position
                     findViewById<TextView>(R.id.title_bar).text = tabTitles[tab.position]
                 }
@@ -84,43 +99,59 @@ class MainActivity : AppCompatActivity() {
         viewPager2.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
+                Log.d("MainActivity", "Page selected: ${tabTitles[position]}")
                 tabLayout.selectTab(tabLayout.getTabAt(position))
             }
         })
 
+        // Authentication check for user login status
         auth = FirebaseAuth.getInstance()
         if (auth.currentUser == null) {
+            Log.w("MainActivity", "User not logged in, redirecting to login")
             val intent = Intent(this, Login::class.java)
             startActivity(intent)
         }
     }
 
-    // Initialize MediaPlayer with podcast URL
+    // Initialize the media player with the podcast URL
     private fun initializeMediaPlayer(url: String) {
+        Log.d("MainActivity", "Initializing media player with URL: $url")
         mediaPlayer = MediaPlayer()
 
         try {
             mediaPlayer.setDataSource(url)
             mediaPlayer.prepareAsync()
             mediaPlayer.setOnPreparedListener {
+                Log.d("MainActivity", "Media player prepared, starting playback")
                 mediaPlayer.start()
-                miniPlayer.visibility = View.VISIBLE // Show mini player when ready
-                miniPlayerTitle.text = "Playing Podcast Title" // Replace with actual title
+
+                // Show mini player when the podcast starts playing
+                miniPlayer.visibility = View.VISIBLE
+                miniPlayerTitle.text = "Playing Podcast Title" // Replace with the actual title from metadata
+
+                // Set play button to "Pause" as media starts playing
+                miniPlayerPlayPauseButton.setImageResource(R.drawable.ic_pause)
             }
+
             mediaPlayer.setOnCompletionListener {
-                miniPlayer.visibility = View.GONE // Hide mini player when podcast is done
+                Log.d("MainActivity", "Media player completed, hiding mini player")
+                // Hide mini player when the podcast finishes
+                miniPlayer.visibility = View.GONE
             }
         } catch (e: IOException) {
-            e.printStackTrace()
+            Log.e("MainActivity", "Error initializing media player", e)
         }
     }
 
+    // Set the current tab programmatically
     fun setCurrentTab(index: Int) {
+        Log.d("MainActivity", "Setting current tab to index: $index")
         viewPager2.currentItem = index
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        Log.d("MainActivity", "onDestroy called, releasing media player")
         if (::mediaPlayer.isInitialized) {
             mediaPlayer.release()
         }

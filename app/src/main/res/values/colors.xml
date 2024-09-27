@@ -4,4 +4,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="gray">#959292</color>
     <color name="yellow">#FFCE00</color>
+    <color name="miniplayer_bg">#B5B4B1</color>
 </resources>
