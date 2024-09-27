@@ -1,5 +1,9 @@
 package com.nyinj.podcastapp.Activities
 
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.widget.ImageButton
@@ -7,27 +11,47 @@ import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import java.io.IOException
 import android.os.Handler
+import android.os.IBinder
 import com.nyinj.podcastapp.R
+import com.nyinj.podcastapp.Services.MediaPlayerService
 
 class PodcastPlayerActivity : AppCompatActivity() {
 
-    private lateinit var mediaPlayer: MediaPlayer
     private lateinit var seekBar: SeekBar
     private lateinit var currentTime: TextView
     private lateinit var totalTime: TextView
     private lateinit var handler: Handler
-    private lateinit var playpauseButton : ImageButton
+    private lateinit var playpauseButton: ImageButton
     private lateinit var backButton: ImageButton
-    private var isPlaying = false
+    private lateinit var forwardButton: ImageButton
+    private lateinit var backButton10s: ImageButton
+    private lateinit var mediaPlayerService: MediaPlayerService
+    private var serviceBound = false
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as MediaPlayerService.MediaPlayerBinder
+            mediaPlayerService = binder.getService()
+            serviceBound = true
+            updateSeekBar()
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            serviceBound = false
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_podcast_player)
 
-        // Get the podcast URL passed from the BrowseFragment
         val audioUrl = intent.getStringExtra("AUDIO_URL")
+        val serviceIntent = Intent(this, MediaPlayerService::class.java).apply {
+            putExtra("AUDIO_URL", audioUrl)
+        }
+        startService(serviceIntent)
+        bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
 
         // Initialize UI elements
         playpauseButton = findViewById(R.id.playPauseButton)
@@ -35,68 +59,66 @@ class PodcastPlayerActivity : AppCompatActivity() {
         currentTime = findViewById(R.id.current_time)
         totalTime = findViewById(R.id.total_time)
         handler = Handler()
-        backButton=findViewById(R.id.back_btn)
+        backButton = findViewById(R.id.back_btn)
 
-        // Initialize MediaPlayer
-        mediaPlayer = MediaPlayer()
+        backButton.setOnClickListener { finish() }
 
-        backButton.setOnClickListener{
-            finish() //to close the activity
-        }
-
-        try {
-            mediaPlayer.setDataSource(audioUrl) // Load the audio file from URL
-            mediaPlayer.prepareAsync() // Prepare asynchronously
-            mediaPlayer.setOnPreparedListener {
-                seekBar.max = mediaPlayer.duration
-                totalTime.text = formatTime(mediaPlayer.duration)
-            }
-
-            mediaPlayer.setOnCompletionListener {
-                playpauseButton.setImageResource(R.drawable.ic_play) // Reset to play icon
-                isPlaying = false
-            }
-
-        } catch (e: IOException) {
-            e.printStackTrace()
-            Toast.makeText(this, "Error loading podcast", Toast.LENGTH_SHORT).show()
-        }
-
-        // Play/Pause button action
         playpauseButton.setOnClickListener {
-            if (isPlaying) {
-                mediaPlayer.pause()
-                playpauseButton.setImageResource(R.drawable.ic_play)
-            } else {
-                mediaPlayer.start()
-                updateTime()
-                playpauseButton.setImageResource(R.drawable.ic_pause)
+            if (serviceBound) {
+                mediaPlayerService.playPause()
+                updatePlayPauseButton()
             }
-            isPlaying = !isPlaying
         }
 
         // SeekBar change listener
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser) {
-                    mediaPlayer.seekTo(progress)
-                    currentTime.text = formatTime(mediaPlayer.currentPosition)
+                if (fromUser && serviceBound) {
+                    mediaPlayerService.seekTo(progress)
+                    currentTime.text = formatTime(mediaPlayerService.getCurrentPosition())
                 }
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
+
+        // Initialize new buttons
+        forwardButton = findViewById(R.id.forward10s)
+        backButton10s = findViewById(R.id.back10s)
+
+        forwardButton.setOnClickListener {
+            if (serviceBound) {
+                mediaPlayerService.skipForward() // Skip 10 seconds
+            }
+        }
+
+        backButton10s.setOnClickListener {
+            if (serviceBound) {
+                mediaPlayerService.skipBackward() // Go back 10 seconds
+            }
+        }
     }
 
-    private fun updateTime() {
-        handler.postDelayed({
-            if (mediaPlayer.isPlaying) {
-                seekBar.progress = mediaPlayer.currentPosition
-                currentTime.text = formatTime(mediaPlayer.currentPosition)
-                updateTime()
+    private fun updateSeekBar() {
+        if (serviceBound) {
+            seekBar.max = mediaPlayerService.getDuration()
+            seekBar.progress = mediaPlayerService.getCurrentPosition()
+            totalTime.text = formatTime(mediaPlayerService.getDuration())
+            currentTime.text = formatTime(mediaPlayerService.getCurrentPosition())
+
+            handler.postDelayed({ updateSeekBar() }, 1000)
+        }
+    }
+
+    private fun updatePlayPauseButton() {
+        if (serviceBound) {
+            if (mediaPlayerService.isPlaying) {
+                playpauseButton.setImageResource(R.drawable.ic_pause)
+            } else {
+                playpauseButton.setImageResource(R.drawable.ic_play)
             }
-        }, 1000)
+        }
     }
 
     private fun formatTime(milliseconds: Int): String {
@@ -107,8 +129,16 @@ class PodcastPlayerActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        if (::mediaPlayer.isInitialized) {
-            mediaPlayer.release() // Release resources
+        if (serviceBound) {
+            unbindService(serviceConnection)
+            serviceBound = false
         }
+    }
+
+    override fun onBackPressed() {
+        if (serviceBound && mediaPlayerService.isPlaying) {
+            mediaPlayerService.playPause()
+        }
+        super.onBackPressed() // Closes the activity
     }
 }
