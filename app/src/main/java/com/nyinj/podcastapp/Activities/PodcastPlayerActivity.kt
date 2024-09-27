@@ -14,6 +14,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Handler
 import android.os.IBinder
 import android.util.Log
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ktx.database
+import com.google.firebase.database.ktx.getValue
 import com.nyinj.podcastapp.R
 import com.nyinj.podcastapp.Services.MediaPlayerService
 
@@ -28,6 +32,8 @@ class PodcastPlayerActivity : AppCompatActivity() {
     private lateinit var forwardButton: ImageButton
     private lateinit var backButton10s: ImageButton
     private lateinit var mediaPlayerService: MediaPlayerService
+    private lateinit var titleTextView: TextView
+    private lateinit var uploaderNameTextView: TextView
     private var serviceBound = false
 
     private val serviceConnection = object : ServiceConnection {
@@ -36,8 +42,6 @@ class PodcastPlayerActivity : AppCompatActivity() {
             mediaPlayerService = binder.getService()
             serviceBound = true
             updateSeekBar()
-
-            // Check if the audio is currently playing and update the play/pause button accordingly
             updatePlayPauseButton()
         }
 
@@ -50,16 +54,18 @@ class PodcastPlayerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_podcast_player)
 
+        // Retrieve extras from the Intent
         val audioUrl = intent.getStringExtra("AUDIO_URL")
+        val podcastId = intent.getStringExtra("PODCAST_ID") // Add this to pass podcast ID
 
+        // Ensure the audio URL is valid before starting the service
         if (audioUrl != null) {
             startMediaPlayerService(audioUrl)
+        } else {
+            Toast.makeText(this, "Audio URL is null", Toast.LENGTH_SHORT).show()
+            finish() // Close activity if audio URL is null
         }
-        val serviceIntent = Intent(this, MediaPlayerService::class.java).apply {
-            putExtra("AUDIO_URL", audioUrl)
-        }
-        startService(serviceIntent)
-        bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+        Log.d("PodcastPlayerActivity", "Podcast ID: $podcastId")
 
         // Initialize UI elements
         playpauseButton = findViewById(R.id.playPauseButton)
@@ -68,6 +74,11 @@ class PodcastPlayerActivity : AppCompatActivity() {
         totalTime = findViewById(R.id.total_time)
         handler = Handler()
         backButton = findViewById(R.id.back_btn)
+        titleTextView = findViewById(R.id.title_player)
+        uploaderNameTextView = findViewById(R.id.uploader_player)
+
+        // Fetch podcast details from Firebase
+        fetchPodcastDetails(podcastId)
 
         backButton.setOnClickListener { finish() }
 
@@ -116,6 +127,32 @@ class PodcastPlayerActivity : AppCompatActivity() {
         bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
     }
 
+    private fun fetchPodcastDetails(podcastId: String?) {
+        if (podcastId != null) {
+            // Get a reference to the Firebase Database
+            val database = FirebaseDatabase.getInstance()
+            val podcastRef: DatabaseReference = database.getReference("podcasts").child(podcastId)
+
+            podcastRef.get().addOnSuccessListener { snapshot ->
+                if (snapshot.exists()) {
+                    // Assuming your Podcast data class has title and uploaderName fields
+                    val title = snapshot.child("title").getValue<String>()
+                    val uploaderName = snapshot.child("uploaderName").getValue<String>()
+
+                    // Update UI
+                    titleTextView.text = title ?: "Unknown Title"
+                    uploaderNameTextView.text = uploaderName ?: "Unknown Uploader"
+
+                    Log.d("PodcastPlayerActivity", "Title: $title, Uploader: $uploaderName")
+                } else {
+                    Toast.makeText(this, "Podcast not found", Toast.LENGTH_SHORT).show()
+                }
+            }.addOnFailureListener {
+                Toast.makeText(this, "Failed to retrieve podcast details", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     private fun updateSeekBar() {
         if (serviceBound) {
             seekBar.max = mediaPlayerService.getDuration()
@@ -128,13 +165,8 @@ class PodcastPlayerActivity : AppCompatActivity() {
     }
 
     private fun updatePlayPauseButton() {
-        Log.d("PodcastPlayerActivity", "Updating play/pause button. Is playing: ${mediaPlayerService.isPlaying}")
         if (serviceBound) {
-            if (mediaPlayerService.isPlaying) {
-                playpauseButton.setImageResource(R.drawable.ic_pause)
-            } else {
-                playpauseButton.setImageResource(R.drawable.ic_play)
-            }
+            playpauseButton.setImageResource(if (mediaPlayerService.isPlaying) R.drawable.ic_pause else R.drawable.ic_play)
         }
     }
 
