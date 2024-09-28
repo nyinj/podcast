@@ -1,9 +1,12 @@
 package com.nyinj.podcastapp.Fragments
 
 import com.nyinj.podcastapp.DataClass.Podcast
-import com.nyinj.podcastapp.Adapters.PodcastAdapter
 import android.app.Activity
+import android.app.Dialog
+import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -25,6 +28,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.nyinj.podcastapp.Activities.EditProfileActivity
 import com.nyinj.podcastapp.Activities.Login
 import com.nyinj.podcastapp.Activities.PodcastPlayerActivity
+import com.nyinj.podcastapp.Adapters.UserPodcastAdapter
 import com.nyinj.podcastapp.DataClass.Users
 import com.nyinj.podcastapp.R
 
@@ -36,7 +40,7 @@ class YouFragment : Fragment() {
     private lateinit var storage: FirebaseStorage
     private val REQUEST_CODE_AUDIO = 1001
     private lateinit var userRecyclerView: RecyclerView
-    private lateinit var podcastAdapter: PodcastAdapter
+    private lateinit var UserPodcastAdapter: UserPodcastAdapter
     private val userPodcastList = mutableListOf<Podcast>()
     private var userPodcastCount = 0
 
@@ -59,24 +63,127 @@ class YouFragment : Fragment() {
         userRecyclerView = view.findViewById(R.id.userRecyclerView)
         userRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        podcastAdapter = PodcastAdapter(requireContext(), userPodcastList, // Pass the context to the adapter
+        UserPodcastAdapter = UserPodcastAdapter(requireContext(), userPodcastList,
             { podcast ->
-                // Handle item click to play podcast in a new activity
-                val intent = Intent(requireContext(), PodcastPlayerActivity::class.java).apply {
-                    putExtra("AUDIO_URL", podcast.audioUrl) // Pass the audio URL
-                    putExtra("PODCAST_ID", podcast.id)
-                }
-                startActivity(intent) // Start the PodcastPlayerActivity
+                // Play podcast
+                val intent = Intent(requireContext(), PodcastPlayerActivity::class.java)
+                intent.putExtra("AUDIO_URL", podcast.audioUrl)
+                intent.putExtra("PODCAST_ID", podcast.id)
+                startActivity(intent)
+            },
+            { podcast ->
+                // Handle edit action
+                promptForPodcastEdit(podcast)
+            },
+            { podcast, position -> // Updated this line
+                // Handle delete action
+                deletePodcast(podcast, position) // Pass position to the delete method
             }
         )
 
-        userRecyclerView.adapter = podcastAdapter
+        userRecyclerView.adapter = UserPodcastAdapter
 
         // Fetch data from Firebase for current user
         loadUserPodcasts()
 
         return view
     }
+
+
+
+    private fun deletePodcast(podcast: Podcast, position: Int) {
+        val databaseRef = podcast.id?.let {
+            FirebaseDatabase.getInstance().getReference("podcasts").child(it)
+        }
+
+        // Check if database reference is valid
+        if (databaseRef == null) {
+            Toast.makeText(requireContext(), "Invalid podcast reference", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Start deletion from Firebase Database
+        databaseRef.removeValue().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                // On successful deletion from Firebase, remove it from the adapter
+                UserPodcastAdapter.removePodcastAt(position)
+                Toast.makeText(requireContext(), "Podcast deleted successfully", Toast.LENGTH_SHORT).show()
+
+                // Attempt to delete the audio file from Firebase Storage if the audioUrl is not null
+                podcast.audioUrl?.let { audioUrl ->
+                    val storageRef = FirebaseStorage.getInstance().getReferenceFromUrl(audioUrl)
+                    storageRef.delete().addOnCompleteListener { deleteTask ->
+                        if (deleteTask.isSuccessful) {
+                            Toast.makeText(requireContext(), "Audio file deleted.", Toast.LENGTH_SHORT).show()
+                        } else {
+                            // Log specific error message
+                            Log.e("DeletePodcast", "Failed to delete audio file: ${deleteTask.exception?.message}")
+                            Toast.makeText(requireContext(), "Failed to delete audio file.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } ?: run {
+                    Log.e("DeletePodcast", "Audio URL is null, skipping deletion.")
+                }
+            } else {
+                // Log specific error message
+                Log.e("DeletePodcast", "Failed to delete podcast: ${task.exception?.message}")
+                Toast.makeText(requireContext(), "Failed to delete podcast", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+
+    fun showLoadingDialog(context: Context): Dialog {
+        val dialog = Dialog(context)
+        dialog.setContentView(R.layout.dialog_loading)
+        dialog.setCancelable(false)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.WHITE))
+        dialog.show()
+        return dialog
+    }
+
+
+
+    private fun promptForPodcastEdit(podcast: Podcast) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_add_podcast, null)
+        val titleInput = dialogView.findViewById<EditText>(R.id.podcastTitle)
+        val descriptionInput = dialogView.findViewById<EditText>(R.id.podcastDescription)
+
+        titleInput.setText(podcast.title)
+        descriptionInput.setText(podcast.description)
+
+        val dialog = android.app.AlertDialog.Builder(requireContext())
+            .setTitle("Edit Podcast")
+            .setView(dialogView)
+            .setPositiveButton("Save") { _, _ ->
+                val newTitle = titleInput.text.toString()
+                val newDescription = descriptionInput.text.toString()
+
+                if (newTitle.isNotBlank() && newDescription.isNotBlank()) {
+                    // Update the podcast metadata
+                    val podcastRef =
+                        podcast.id?.let {
+                            FirebaseDatabase.getInstance().getReference("podcasts").child(
+                                it
+                            )
+                        }
+                    if (podcastRef != null) {
+                        podcastRef.child("title").setValue(newTitle)
+                    }
+                    if (podcastRef != null) {
+                        podcastRef.child("description").setValue(newDescription)
+                    }
+                    Toast.makeText(requireContext(), "Podcast updated!", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(requireContext(), "Title and description cannot be empty.", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        dialog.show()
+    }
+
 
     private fun loadUserPodcasts() {
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
@@ -95,7 +202,7 @@ class YouFragment : Fragment() {
                     }
                 }
                 Log.d("YouFragment", "User Podcasts: $userPodcastList")
-                podcastAdapter.notifyDataSetChanged() // Update RecyclerView
+                UserPodcastAdapter.notifyDataSetChanged() // Update RecyclerView
 
                 // Update the podcast count TextView
                 val podcastCountTextView = view?.findViewById<TextView>(R.id.podcast_count)
@@ -209,7 +316,7 @@ class YouFragment : Fragment() {
         val descriptionInput = dialogView.findViewById<EditText>(R.id.podcastDescription)
 
         val dialog = android.app.AlertDialog.Builder(requireContext())
-            .setTitle("com.nyinj.podcastapp.DataClass.Podcast Details")
+            .setTitle("Podcast Information")
             .setView(dialogView)
             .setPositiveButton("Upload") { _, _ ->
                 val podcastTitle = titleInput.text.toString()
@@ -228,6 +335,9 @@ class YouFragment : Fragment() {
     }
     // Function to upload podcast
     private fun uploadPodcast(audioUri: Uri, userName: String, podcastTitle: String, podcastDescription: String) {
+        // Show loading dialog
+        val progressDialog = showLoadingDialog(requireContext())
+
         val userId = auth.currentUser?.uid
         val storageRef = storage.reference.child("podcasts/${System.currentTimeMillis()}.mp3")
 
@@ -236,11 +346,14 @@ class YouFragment : Fragment() {
             storageRef.downloadUrl.addOnSuccessListener { uri ->
                 val audioUrl = uri.toString()
                 savePodcastMetadata(audioUrl, userName, podcastTitle, podcastDescription, userId)
+                progressDialog.dismiss() // Dismiss dialog on success
             }
         }.addOnFailureListener { e ->
             Toast.makeText(requireContext(), "Failed to upload podcast: ${e.message}", Toast.LENGTH_SHORT).show()
+            progressDialog.dismiss() // Dismiss dialog on failure
         }
     }
+
 
     // Save podcast metadata to Firebase Realtime Database
     private fun savePodcastMetadata(audioUrl: String, userName: String, podcastTitle: String, podcastDescription: String, userId: String?) {

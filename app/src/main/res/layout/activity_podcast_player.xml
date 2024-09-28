@@ -130,12 +130,38 @@
 
     </RelativeLayout>
 
-    <SeekBar
-        android:id="@+id/volumeSeekBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="20dp"
-        android:max="100" />
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <SeekBar
+            android:id="@+id/volumeSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="20dp"
+            android:max="100"
+            android:layout_marginBottom="10dp"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/volume_down"
+            android:paddingLeft="10dp"
+            android:layout_below="@+id/volumeSeekBar"
+            android:layout_alignParentStart="true"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/volume_up"
+            android:layout_below="@+id/volumeSeekBar"
+            android:layout_alignParentEnd="true"
+            android:paddingRight="10dp"/>
+
+
+    </RelativeLayout>
+
+
 
 
 

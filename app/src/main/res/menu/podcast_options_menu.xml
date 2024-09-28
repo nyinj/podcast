@@ -1,0 +1,9 @@
+<!-- res/menu/podcast_options_menu.xml -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/edit_podcast"
+        android:title="Edit" />
+    <item
+        android:id="@+id/delete_podcast"
+        android:title="Delete" />
+</menu>
