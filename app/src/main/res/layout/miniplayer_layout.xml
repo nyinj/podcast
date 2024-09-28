@@ -1,0 +1,46 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:background="@color/yellow"
+    android:elevation="4dp">
+
+    <ImageView
+        android:id="@+id/miniplayer_thumbnail"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/ic_browse" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:paddingStart="8dp">
+
+        <TextView
+            android:id="@+id/miniplayer_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Podcast Title"
+            android:textColor="@android:color/white"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/miniplayer_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Playing now..."
+            android:textColor="@android:color/white" />
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/miniplayer_play_pause"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="?attr/selectableItemBackground"
+        android:src="@drawable/ic_play"
+        android:contentDescription="Play/Pause" />
+</LinearLayout>

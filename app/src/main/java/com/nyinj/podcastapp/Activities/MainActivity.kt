@@ -39,6 +39,7 @@ class MainActivity : AppCompatActivity() {
             mediaPlayerService = binder.getService()
             isBound = true
             Log.d("MainActivity", "Service connected")
+
         }
 
         override fun onServiceDisconnected(name: ComponentName) {
@@ -66,10 +67,6 @@ class MainActivity : AppCompatActivity() {
         viewPager2.adapter = adapter
         findViewById<TextView>(R.id.title_bar).text = tabTitles[0]
 
-        miniPlayer = findViewById(R.id.mini_player)
-        miniPlayerTitle = findViewById(R.id.mini_player_title)
-        miniPlayerPlayPauseButton = findViewById(R.id.mini_player_play_pause)
-
         val podcastUrl = intent.getStringExtra("AUDIO_URL")
         Log.d("MainActivity", "Podcast URL: $podcastUrl")
 
@@ -80,16 +77,6 @@ class MainActivity : AppCompatActivity() {
             startService(serviceIntent)
             bindService(serviceIntent, connection, BIND_AUTO_CREATE)
 
-            // Display mini player
-            miniPlayer.visibility = View.VISIBLE
-            miniPlayerTitle.text = "Playing Podcast Title"
-        }
-
-        miniPlayerPlayPauseButton.setOnClickListener {
-            if (isBound && mediaPlayerService != null) {
-                mediaPlayerService?.playPause()
-                updatePlayPauseIcon()
-            }
         }
 
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {

@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.widget.ImageButton
@@ -14,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Handler
 import android.os.IBinder
 import android.util.Log
+import android.view.KeyEvent
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
@@ -32,9 +34,11 @@ class PodcastPlayerActivity : AppCompatActivity() {
     private lateinit var backButton: ImageButton
     private lateinit var forwardButton: ImageButton
     private lateinit var backButton10s: ImageButton
+    private lateinit var audioManager: AudioManager
     private lateinit var mediaPlayerService: MediaPlayerService
     private lateinit var titleTextView: TextView
     private lateinit var uploaderNameTextView: TextView
+    private lateinit var volumeSeekBar: SeekBar
     private var serviceBound = false
 
     private val serviceConnection = object : ServiceConnection {
@@ -118,6 +122,61 @@ class PodcastPlayerActivity : AppCompatActivity() {
                 mediaPlayerService.skipBackward() // Go back 10 seconds
             }
         }
+
+        audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+        // Find the SeekBar for volume control
+        volumeSeekBar = findViewById(R.id.volumeSeekBar)
+
+        // Set the max value of the SeekBar to the device's max volume for STREAM_MUSIC
+        volumeSeekBar.max = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+
+        // Set the current progress to the current volume level
+        volumeSeekBar.progress = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+
+        // Set up a listener for when the user changes the SeekBar progress
+        volumeSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                // Change the device's media volume according to the SeekBar progress
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0)
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                // Optionally, you can handle any events when user starts adjusting the SeekBar
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                // Optionally, you can handle any events when user stops adjusting the SeekBar
+            }
+        })
+    }
+
+
+    // Optional: Override hardware volume button behavior
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        return when (keyCode) {
+            KeyEvent.KEYCODE_VOLUME_UP -> {
+                // Raise the volume and adjust the SeekBar accordingly
+                audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND)
+                updateVolumeSeekBar()
+                true
+            }
+
+            KeyEvent.KEYCODE_VOLUME_DOWN -> {
+                // Lower the volume and adjust the SeekBar accordingly
+                audioManager.adjustVolume(AudioManager.ADJUST_LOWER, AudioManager.FLAG_PLAY_SOUND)
+                updateVolumeSeekBar()
+                true
+            }
+
+            else -> super.onKeyDown(keyCode, event)
+
+        }
+    }
+
+    // Function to update the SeekBar when volume buttons are pressed
+    private fun updateVolumeSeekBar() {
+        volumeSeekBar.progress = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
     }
 
     private fun startMediaPlayerService(audioUrl: String) {

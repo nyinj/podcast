@@ -6,6 +6,8 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.media.AudioAttributes
+import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Binder
 import android.os.Build
@@ -19,6 +21,7 @@ class MediaPlayerService : Service() {
 
     private val binder = MediaPlayerBinder()
     private lateinit var mediaPlayer: MediaPlayer
+    private var podcastTitle: String? = null
     var isPlaying = true
 
     override fun onBind(intent: Intent?): IBinder {
@@ -31,14 +34,26 @@ class MediaPlayerService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val audioUrl = intent?.getStringExtra("AUDIO_URL") ?: return START_NOT_STICKY
+        podcastTitle = intent.getStringExtra("PODCAST_TITLE") ?: "Unknown Podcast"
         Log.d("MediaPlayerService", "Received audio URL: $audioUrl")
 
         if (this::mediaPlayer.isInitialized) {
             mediaPlayer.release()
         }
 
+        initializeMediaPlayer(audioUrl)
+        return START_NOT_STICKY
+    }
+
+    private fun initializeMediaPlayer(audioUrl: String) {
         try {
             mediaPlayer = MediaPlayer().apply {
+                setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .build()
+                )
                 setDataSource(audioUrl)
                 prepareAsync()
                 setOnPreparedListener {
@@ -63,8 +78,6 @@ class MediaPlayerService : Service() {
             Log.e("MediaPlayerService", "Error initializing MediaPlayer: ${e.message}")
             stopSelf()
         }
-
-        return START_NOT_STICKY
     }
 
     fun playPause() {
@@ -75,22 +88,23 @@ class MediaPlayerService : Service() {
                 mediaPlayer.start()
             }
             isPlaying = !isPlaying
+            updateNotification()
         }
     }
 
     // Method to get the current position
     fun getCurrentPosition(): Int {
-        return mediaPlayer.currentPosition
+        return if (this::mediaPlayer.isInitialized) mediaPlayer.currentPosition else 0
     }
 
     // Method to get the duration of the media
     fun getDuration(): Int {
-        return mediaPlayer.duration
+        return if (this::mediaPlayer.isInitialized) mediaPlayer.duration else 0
     }
 
     // Method to seek to a specific position
     fun seekTo(position: Int) {
-        mediaPlayer.seekTo(position)
+        if (this::mediaPlayer.isInitialized) mediaPlayer.seekTo(position)
     }
 
     // Method to skip forward 10 seconds
@@ -106,13 +120,7 @@ class MediaPlayerService : Service() {
     }
 
     private fun startForegroundService() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                "media_playback", "Media Playback", NotificationManager.IMPORTANCE_LOW
-            )
-            val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(channel)
-        }
+        createNotificationChannel()
 
         val notificationIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
@@ -120,13 +128,50 @@ class MediaPlayerService : Service() {
         )
 
         val notification: Notification = NotificationCompat.Builder(this, "media_playback")
-            .setContentTitle("Podcast is playing")
+            .setContentTitle("Playing: $podcastTitle")
             .setContentText("Your podcast is playing in the background")
             .setSmallIcon(R.drawable.ic_play)
             .setContentIntent(pendingIntent)
+            .addAction(R.drawable.ic_pause, "Pause", getPlayPauseAction())
+            .setOngoing(true)
             .build()
 
         startForeground(1, notification)
+    }
+
+    private fun updateNotification() {
+        val notificationManager = getSystemService(NotificationManager::class.java)
+
+        val notification = NotificationCompat.Builder(this, "media_playback")
+            .setContentTitle("Playing: $podcastTitle")
+            .setContentText("Your podcast is playing in the background")
+            .setSmallIcon(R.drawable.ic_play)
+            .addAction(
+                if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play,
+                if (isPlaying) "Pause" else "Play",
+                getPlayPauseAction()
+            )
+            .setOngoing(isPlaying)
+            .build()
+
+        notificationManager.notify(1, notification)
+    }
+
+    private fun getPlayPauseAction(): PendingIntent {
+        val intent = Intent(this, MediaPlayerService::class.java).apply {
+            action = if (isPlaying) "ACTION_PAUSE" else "ACTION_PLAY"
+        }
+        return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                "media_playback", "Media Playback", NotificationManager.IMPORTANCE_LOW
+            )
+            val manager = getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(channel)
+        }
     }
 
     override fun onDestroy() {
@@ -134,5 +179,10 @@ class MediaPlayerService : Service() {
         if (this::mediaPlayer.isInitialized) {
             mediaPlayer.release()
         }
+    }
+
+    fun getCurrentPodcastTitle(): String? {
+        return podcastTitle
+
     }
 }
