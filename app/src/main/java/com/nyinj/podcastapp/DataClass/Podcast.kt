@@ -7,5 +7,6 @@ data class Podcast(
     val audioUrl: String? = null,
     val uploaderName: String? = null,
     val uploaderId: String? = null,
-    val timestamp: Long? = null
+    val timestamp: Long? = null,
+    val coverUrl: String? = null
 )

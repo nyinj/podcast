@@ -4,8 +4,20 @@
     android:layout_height="wrap_content"
     android:layout_centerVertical="true">
 
+
+
+    <ImageView
+        android:id="@+id/podcast_cover_image"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentStart="true"
+        android:layout_marginEnd="10dp"
+        android:contentDescription="Podcast Cover"
+        android:scaleType="centerCrop" />
+
     <LinearLayout
         android:id="@+id/title_description"
+        android:layout_toRightOf="@+id/podcast_cover_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
