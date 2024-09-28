@@ -18,6 +18,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
+import com.nyinj.podcastapp.DataClass.Podcast
 import com.nyinj.podcastapp.R
 import com.nyinj.podcastapp.Services.MediaPlayerService
 
@@ -129,26 +130,28 @@ class PodcastPlayerActivity : AppCompatActivity() {
 
     private fun fetchPodcastDetails(podcastId: String?) {
         if (podcastId != null) {
-            // Get a reference to the Firebase Database
             val database = FirebaseDatabase.getInstance()
             val podcastRef: DatabaseReference = database.getReference("podcasts").child(podcastId)
 
             podcastRef.get().addOnSuccessListener { snapshot ->
                 if (snapshot.exists()) {
-                    // Assuming your Podcast data class has title and uploaderName fields
-                    val title = snapshot.child("title").getValue<String>()
-                    val uploaderName = snapshot.child("uploaderName").getValue<String>()
+                    // Retrieve entire object as Podcast
+                    val podcast = snapshot.getValue(Podcast::class.java)
+
+                    // Log the podcast object to debug
+                    Log.d("PodcastPlayerActivity", "Podcast: $podcast")
 
                     // Update UI
-                    titleTextView.text = title ?: "Unknown Title"
-                    uploaderNameTextView.text = uploaderName ?: "Unknown Uploader"
-
-                    Log.d("PodcastPlayerActivity", "Title: $title, Uploader: $uploaderName")
+                    titleTextView.text = podcast?.title ?: "Unknown Title"
+                    uploaderNameTextView.text = podcast?.uploaderName ?: "Unknown Uploader"
                 } else {
+                    Log.d("PodcastPlayerActivity", "Podcast not found in database")
                     Toast.makeText(this, "Podcast not found", Toast.LENGTH_SHORT).show()
                 }
-            }.addOnFailureListener {
-                Toast.makeText(this, "Failed to retrieve podcast details", Toast.LENGTH_SHORT).show()
+            }.addOnFailureListener { exception ->
+                Log.e("PodcastPlayerActivity", "Failed to retrieve podcast details", exception)
+                Toast.makeText(this, "Failed to retrieve podcast details", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }

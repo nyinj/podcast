@@ -50,6 +50,7 @@ class BrowseFragment : Fragment() {
                 // Handle item click to play podcast in a new activity
                 val intent = Intent(requireContext(), PodcastPlayerActivity::class.java).apply {
                     putExtra("AUDIO_URL", podcast.audioUrl) // Pass the audio URL
+                    putExtra("PODCAST_ID", podcast.id)
                 }
                 startActivity(intent) // Start the PodcastPlayerActivity
             }

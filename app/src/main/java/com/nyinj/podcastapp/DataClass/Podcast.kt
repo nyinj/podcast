@@ -1,11 +1,11 @@
 package com.nyinj.podcastapp.DataClass
 
 data class Podcast(
-    val id: String ="",
-    val title: String = "",
-    val description: String = "",
-    val audioUrl: String = "",
-    val uploaderName: String = "",
-    val uploaderId: String = "",
-    val timestamp: Long = 0L
+    val id: String? = null,
+    val title: String? = null,
+    val description: String? = null,
+    val audioUrl: String? = null,
+    val uploaderName: String? = null,
+    val uploaderId: String? = null,
+    val timestamp: Long? = null
 )
