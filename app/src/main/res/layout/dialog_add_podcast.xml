@@ -19,6 +19,13 @@
         android:layout_height="wrap_content"
         android:hint="Podcast Description"/>
 
+    <ImageView
+        android:id="@+id/coverImagePreview"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:scaleType="centerCrop"
+        android:visibility="gone" /> <!-- Initially hidden -->
+
     <Button
         android:id="@+id/btnChooseCover"
         android:layout_width="wrap_content"

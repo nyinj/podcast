@@ -54,6 +54,8 @@ class MainActivity : AppCompatActivity() {
         Log.d("MainActivity", "onCreate called")
         setContentView(R.layout.activity_main)
 
+        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_HIDE_NAVIGATION  or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
+
         tabLayout = findViewById(R.id.tab_layout)
         viewPager2 = findViewById(R.id.viewpager2)
         adapter = FragmentPageAdapter(supportFragmentManager, lifecycle)

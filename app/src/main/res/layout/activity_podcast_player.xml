@@ -5,11 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:paddingRight="16dp"
+    android:paddingLeft="16dp"
+    android:paddingBottom="16dp"
+    android:background="@color/white">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="70dp">
+        android:layout_height="70dp"
+        android:background="@drawable/title_bar_background"
+        android:padding="10dp">
 
         <ImageButton
             android:id="@+id/back_btn"
@@ -25,26 +30,29 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Playing Now"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
             android:layout_centerInParent="true"/>
 
     </RelativeLayout>
-
 
     <ImageView
         android:id="@+id/player_pic"
         android:layout_width="match_parent"
         android:layout_height="342dp"
         android:layout_marginTop="16dp"
-        android:src="@drawable/unknownpodcast" />
+        android:src="@drawable/unknownpodcast"
+        android:scaleType="centerCrop"
+        android:background="@drawable/image_border"/>
 
     <SeekBar
         android:id="@+id/seek_bar"
         android:layout_width="match_parent"
-        android:paddingTop="16dp"
+        android:paddingTop="40dp"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/current_time" />
+        android:progressDrawable="@drawable/seek_bar_progress"
+        android:thumb="@drawable/seekbar_thumb"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -57,8 +65,8 @@
             android:text="00:00"
             android:layout_alignParentStart="true"
             android:padding="16dp"
-            />
-
+            android:textColor="@color/black"
+            android:textSize="14sp"/>
 
         <TextView
             android:id="@+id/total_time"
@@ -66,8 +74,9 @@
             android:layout_height="wrap_content"
             android:text="00:00"
             android:layout_alignParentEnd="true"
-            android:padding="16dp" />
-
+            android:padding="16dp"
+            android:textColor="@color/black"
+            android:textSize="14sp"/>
 
     </RelativeLayout>
 
@@ -81,21 +90,26 @@
             android:layout_height="wrap_content"
             android:text="Title"
             android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
             android:layout_centerHorizontal="true"
             android:paddingBottom="10dp"/>
+
         <TextView
             android:id="@+id/uploader_player"
             android:layout_below="@+id/title_player"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/black"
+            android:textColor="@color/gray"
             android:text="Uploader name"
             android:paddingBottom="10dp"
             android:paddingTop="10dp"
-            android:layout_centerHorizontal="true"/>
+            android:layout_centerHorizontal="true"
+            android:textSize="14sp"/>
     </RelativeLayout>
 
     <RelativeLayout
+        android:paddingTop="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -131,11 +145,13 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:layout_width="wrap_content"
+        android:paddingTop="40dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <SeekBar
             android:id="@+id/volumeSeekBar"
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="20dp"
@@ -158,11 +174,5 @@
             android:layout_alignParentEnd="true"
             android:paddingRight="10dp"/>
 
-
     </RelativeLayout>
-
-
-
-
-
 </LinearLayout>

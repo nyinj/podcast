@@ -16,6 +16,9 @@ import android.os.Handler
 import android.os.IBinder
 import android.util.Log
 import android.view.KeyEvent
+import android.view.View
+import android.widget.ImageView
+import com.bumptech.glide.Glide
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
@@ -39,6 +42,9 @@ class PodcastPlayerActivity : AppCompatActivity() {
     private lateinit var titleTextView: TextView
     private lateinit var uploaderNameTextView: TextView
     private lateinit var volumeSeekBar: SeekBar
+    private lateinit var podcastCoverImage: ImageView
+
+
     private var serviceBound = false
 
     private val serviceConnection = object : ServiceConnection {
@@ -59,9 +65,13 @@ class PodcastPlayerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_podcast_player)
 
+        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_HIDE_NAVIGATION  or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
+
         // Retrieve extras from the Intent
         val audioUrl = intent.getStringExtra("AUDIO_URL")
         val podcastId = intent.getStringExtra("PODCAST_ID") // Add this to pass podcast ID
+        podcastCoverImage = findViewById(R.id.player_pic) // Add this
+
 
         // Ensure the audio URL is valid before starting the service
         if (audioUrl != null) {
@@ -103,9 +113,17 @@ class PodcastPlayerActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                // Optional: Stop updating the SeekBar while the user is dragging it
+                handler.removeCallbacksAndMessages(null)
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                // Restart the update when the user stops dragging the SeekBar
+                updateSeekBar()
+            }
         })
+
 
         // Initialize new buttons
         forwardButton = findViewById(R.id.forward10s)
@@ -194,26 +212,36 @@ class PodcastPlayerActivity : AppCompatActivity() {
 
             podcastRef.get().addOnSuccessListener { snapshot ->
                 if (snapshot.exists()) {
-                    // Retrieve entire object as Podcast
                     val podcast = snapshot.getValue(Podcast::class.java)
 
-                    // Log the podcast object to debug
                     Log.d("PodcastPlayerActivity", "Podcast: $podcast")
+                    Log.d("PodcastPlayerActivity", "Cover URL: ${podcast?.coverUrl}")
 
-                    // Update UI
                     titleTextView.text = podcast?.title ?: "Unknown Title"
                     uploaderNameTextView.text = podcast?.uploaderName ?: "Unknown Uploader"
+
+                    if (!podcast?.coverUrl.isNullOrEmpty()) {
+                        if (podcast != null) {
+                            Glide.with(this)
+                                .load(podcast.coverUrl)
+                                .placeholder(R.drawable.unknownpodcast)
+                                .error(R.drawable.unknownpodcast)
+                                .into(podcastCoverImage)
+                        } // Use the initialized ImageView
+                    } else {
+                        podcastCoverImage.setImageResource(R.drawable.unknownpodcast)
+                    }
                 } else {
                     Log.d("PodcastPlayerActivity", "Podcast not found in database")
                     Toast.makeText(this, "Podcast not found", Toast.LENGTH_SHORT).show()
                 }
             }.addOnFailureListener { exception ->
                 Log.e("PodcastPlayerActivity", "Failed to retrieve podcast details", exception)
-                Toast.makeText(this, "Failed to retrieve podcast details", Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(this, "Failed to retrieve podcast details", Toast.LENGTH_SHORT).show()
             }
         }
     }
+
 
     private fun updateSeekBar() {
         if (serviceBound) {
@@ -222,9 +250,10 @@ class PodcastPlayerActivity : AppCompatActivity() {
             totalTime.text = formatTime(mediaPlayerService.getDuration())
             currentTime.text = formatTime(mediaPlayerService.getCurrentPosition())
 
-            handler.postDelayed({ updateSeekBar() }, 1000)
+            handler.postDelayed({ updateSeekBar() }, 1000) // Update every second
         }
     }
+
 
     private fun updatePlayPauseButton() {
         if (serviceBound) {

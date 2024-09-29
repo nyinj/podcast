@@ -2,91 +2,101 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_centerVertical="true">
-
-
-
-    <ImageView
-        android:id="@+id/podcast_cover_image"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_alignParentStart="true"
-        android:layout_marginEnd="10dp"
-        android:contentDescription="Podcast Cover"
-        android:scaleType="centerCrop" />
-
-    <LinearLayout
-        android:id="@+id/title_description"
-        android:layout_toRightOf="@+id/podcast_cover_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingLeft="20dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp">
-        <TextView
-            android:id="@+id/podcast_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="title"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/podcastDescription"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="description"
-            android:textSize="15sp"
-            android:layout_alignBottom="@+id/podcast_title"/>
-
-
-    </LinearLayout>
-
+    android:layout_centerVertical="true"
+    android:padding="8dp">
 
     <RelativeLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/imageView"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="-2dp"
-        android:layout_marginBottom="2dp">
-
-        <ImageButton
-            android:id="@+id/play_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerInParent="true"
-            android:background="?attr/selectableItemBackground"
-            android:contentDescription="Play"
-            android:paddingRight="50dp"
-            android:paddingBottom="20dp"
-            android:src="@drawable/ic_play" />
-
+        android:background="@drawable/edit_text_background"
+        android:padding="10dp">
         <ImageView
-            android:id="@+id/overflow_menu"
+            android:id="@+id/podcast_cover_image"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_alignParentStart="true"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/edit_text_background"
+            android:contentDescription="Podcast Cover"
+            android:layout_centerInParent="true"
+            android:layout_marginLeft="20dp"
+            android:scaleType="centerCrop" />
+
+        <LinearLayout
+            android:id="@+id/title_description"
+            android:layout_toRightOf="@+id/podcast_cover_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="20dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
+            <TextView
+                android:id="@+id/podcast_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="title"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/podcastuploader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="uploader"
+                android:textSize="15sp"
+                android:layout_alignBottom="@+id/podcast_title"/>
+
+            <TextView
+                android:id="@+id/podcastDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="description"
+                android:textSize="15sp"
+                android:layout_alignBottom="@+id/podcast_title"/>
+
+
+
+        </LinearLayout>
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
             android:layout_alignParentEnd="true"
-            android:layout_gravity="end"
-            android:contentDescription="More options"
-            android:src="@drawable/threedots"
-            android:visibility="gone"/>
+            android:layout_marginEnd="-2dp"
+            android:layout_marginBottom="2dp">
+
+            <ImageButton
+                android:id="@+id/play_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerInParent="true"
+                android:background="?attr/selectableItemBackground"
+                android:contentDescription="Play"
+                android:paddingRight="50dp"
+                android:paddingBottom="20dp"
+                android:clickable="false"
+                android:src="@drawable/circle_play" />
+
+            <ImageView
+                android:id="@+id/overflow_menu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_gravity="end"
+                android:contentDescription="More options"
+                android:src="@drawable/threedots"
+                android:visibility="gone"/>
+
+
+        </RelativeLayout>
 
 
     </RelativeLayout>
-
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/title_description"
-        android:layout_centerHorizontal="true"
-        android:src="@drawable/divider" />
-
-
 
 
 

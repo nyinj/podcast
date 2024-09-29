@@ -1,41 +1,117 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="#FFFFFF">
 
-    <EditText
-        android:id="@+id/editUsername"
+    <!-- Profile Picture Section -->
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter new username"
-        android:textSize="18sp"
-        android:padding="12dp"/>
+        android:layout_marginBottom="24dp"
+        android:gravity="center">
 
-    <EditText
-        android:id="@+id/editDescription"
+        <ImageView
+            android:id="@+id/profile_image"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/ic_default_profile"
+            android:scaleType="centerCrop"
+            android:background="@drawable/cirecle_background"/>
+
+        <Button
+            android:id="@+id/add_picture_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/profile_image"
+            android:layout_marginTop="15dp"
+            android:backgroundTint="@color/yellow"
+            android:padding="8dp"
+            android:text="Add Profile Picture"
+            android:textColor="#FFFFFF" />
+
+    </RelativeLayout>
+
+    <!-- Name Input -->
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter new description"
-        android:textSize="18sp"
-        android:padding="12dp"
-        android:layout_marginTop="16dp"/>
+        android:hint="Name">
 
-    <Button
-        android:id="@+id/saveButton"
+        <EditText
+            android:id="@+id/edit_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:background="@drawable/edit_text_background"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Email Input -->
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Save"
-        android:layout_marginTop="32dp"
-        android:padding="12dp"/>
+        android:hint="Email">
 
+        <EditText
+            android:id="@+id/edit_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:background="@drawable/edit_text_background"
+            android:inputType="textEmailAddress" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Phone Number Input -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Phone Number">
+
+        <EditText
+            android:id="@+id/edit_phone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:background="@drawable/edit_text_background"
+            android:inputType="phone" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!--  Bio Input -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Bio">
+
+        <EditText
+            android:id="@+id/edit_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:background="@drawable/edit_text_background"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+
+    <!-- Progress Bar -->
     <ProgressBar
         android:id="@+id/editProgressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
         android:layout_gravity="center"
-        android:layout_marginTop="16dp"/>
+        android:visibility="gone"/>
 
+    <!-- Save Button -->
+    <Button
+        android:id="@+id/save_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/yellow"
+        android:text="Save Changes"
+        android:textColor="#FFFFFF"
+        android:padding="12dp"
+        android:layout_marginTop="24dp"/>
 </LinearLayout>
