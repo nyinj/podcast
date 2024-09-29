@@ -21,8 +21,8 @@ class FragmentPageAdapter(
     override fun createFragment(position: Int): Fragment {
         return when (position) {
             0 -> HomeFragment()
-            1 -> ExploreFragment()
-            2 -> BrowseFragment()
+            1 ->  BrowseFragment()
+            2 -> ExploreFragment()
             3 -> YouFragment()
             else -> throw IllegalArgumentException("Invalid position $position") //safety check
         }

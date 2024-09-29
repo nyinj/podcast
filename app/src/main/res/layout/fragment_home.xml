@@ -83,11 +83,29 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
         </LinearLayout>
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewRecentlyPlayedPodcasts"
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/search_input_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp" />
+            app:hintEnabled="true"
+            app:hintAnimationEnabled="true"
+            app:startIconDrawable="@drawable/ic_search"
+            app:startIconContentDescription="@string/search_icon_desc">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/search_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Search for podcasts" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/search_results_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
     </LinearLayout>
 
 </FrameLayout>

@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager2: ViewPager2
     private lateinit var adapter: FragmentPageAdapter
-    private val tabTitles = arrayOf("Home", "Explore", "Browse", "You")
+    private val tabTitles = arrayOf("Home", "Browse", "Explore", "You")
     private lateinit var auth: FirebaseAuth
     private lateinit var miniPlayer: RelativeLayout
     private lateinit var miniPlayerTitle: TextView
@@ -62,9 +62,9 @@ class MainActivity : AppCompatActivity() {
 
         // Set icons for tabs instead of text
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_home))
-        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_explore))
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_browse))
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_you))
+        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_default_profile))
 
         viewPager2.adapter = adapter
         findViewById<TextView>(R.id.title_bar).text = tabTitles[0]
