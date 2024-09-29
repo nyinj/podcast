@@ -5,32 +5,49 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:layout_margin="16dp"
+    android:elevation="8dp"
+    android:background="@drawable/dialog_background">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Podcast"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:layout_marginBottom="16dp"/>
 
     <EditText
         android:id="@+id/podcastTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Podcast Title"/>
+        android:hint="Podcast Title"
+        android:padding="12dp"
+        android:background="@drawable/edit_text_background"
+        android:textColor="@color/black"
+        android:textColorHint="@color/gray"/>
 
     <EditText
         android:id="@+id/podcastDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Podcast Description"/>
+        android:hint="Podcast Description"
+        android:padding="12dp"
+        android:background="@drawable/edit_text_background"
+        android:textColor="@color/black"
+        android:textColorHint="@color/gray"/>
 
-    <ImageView
-        android:id="@+id/coverImagePreview"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:scaleType="centerCrop"
-        android:visibility="gone" /> <!-- Initially hidden -->
 
     <Button
         android:id="@+id/btnChooseCover"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Choose Cover Image"
-        android:layout_marginTop="8dp"/>
-
+        android:textColor="@color/white"
+        android:backgroundTint="@color/yellow"
+        android:layout_marginTop="16dp"
+        android:padding="12dp"
+        android:layout_gravity="center"/>
 </LinearLayout>

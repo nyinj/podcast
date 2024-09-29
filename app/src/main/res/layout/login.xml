@@ -52,6 +52,7 @@
             android:layout_height="63dp"
             android:hint="Email"
             android:textColorHint="#A7A7A7"
+            app:hintTextColor="@color/yellow"
             app:boxStrokeColor="#EAEAEE">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -69,6 +70,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="271dp"
             android:layout_height="63dp"
+            app:hintTextColor="@color/yellow"
             android:hint="Password"
             android:textColorHint="#A7A7A7"
             app:endIconMode="password_toggle"
@@ -81,6 +83,7 @@
                 android:textColor="#5B5B5B"
                 android:textSize="15sp"
                 android:textStyle="bold"
+                android:inputType="textPassword"
                 android:imeOptions="actionDone" />
         </com.google.android.material.textfield.TextInputLayout>
 

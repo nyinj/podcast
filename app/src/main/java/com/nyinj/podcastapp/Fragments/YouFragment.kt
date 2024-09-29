@@ -336,7 +336,6 @@ class YouFragment : Fragment() {
         val titleInput = dialogView.findViewById<EditText>(R.id.podcastTitle)
         val descriptionInput = dialogView.findViewById<EditText>(R.id.podcastDescription)
         val chooseCoverButton = dialogView.findViewById<Button>(R.id.btnChooseCover)
-        val coverImagePreview = dialogView.findViewById<ImageView>(R.id.coverImagePreview) // Get from dialogView
 
         chooseCoverButton.setOnClickListener {
             // Launch the image picker for cover image
