@@ -46,6 +46,7 @@ class HomeFragment : Fragment() {
             // Handle item click
             val intent = Intent(requireContext(), PodcastPlayerActivity::class.java)
             intent.putExtra("PODCAST_ID", podcast.id) // Pass the podcast ID
+            intent.putExtra("AUDIO_URL", podcast.audioUrl)
             startActivity(intent)
         }
 
